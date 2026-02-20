@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Server Tree View -->
+    <record id="view_server_tree" model="ir.ui.view">
+        <field name="name">server.monitoring.server.tree</field>
+        <field name="model">server.monitoring.server</field>
+        <field name="arch" type="xml">
+            <tree decoration-danger="health_status == 'critical'"
+                  decoration-warning="health_status == 'warning'"
+                  decoration-muted="state == 'decommissioned'">
+                <field name="name"/>
+                <field name="ip_address"/>
+                <field name="state" widget="badge"/>
+                <field name="health_status" widget="badge"/>
+                <field name="cpu_usage_percent" widget="progressbar"/>
+                <field name="ram_usage_percent" widget="progressbar"/>
+                <field name="disk_usage_percent" widget="progressbar"/>
+                <field name="owner_id"/>
+                <field name="department_id"/>
+                <field name="last_seen"/>
+                <field name="ai_risk_score"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Server Form View -->
+    <record id="view_server_form" model="ir.ui.view">
+        <field name="name">server.monitoring.server.form</field>
+        <field name="model">server.monitoring.server</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_activate" string="Activate" type="object"
+                            class="btn-primary" attrs="{'invisible': [('state', 'not in', ['draft', 'inactive', 'maintenance'])]}"/>
+                    <button name="action_maintenance" string="Maintenance" type="object"
+                            attrs="{'invisible': [('state', '!=', 'active')]}"/>
+                    <button name="action_set_inactive" string="Set Inactive" type="object"
+                            attrs="{'invisible': [('state', '!=', 'active')]}"/>
+                    <button name="action_decommission" string="Decommission" type="object"
+                            class="btn-danger" attrs="{'invisible': [('state', 'in', ['decommissioned'])]}"/>
+                    <button name="action_run_ai_analysis" string="Run AI Analysis" type="object"
+                            class="btn-info"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,active,maintenance,decommissioned"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="%(action_alert_list)d" type="action"
+                                class="oe_stat_button" icon="fa-warning">
+                            <field name="active_alerts_count" widget="statinfo" string="Alerts"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Server Hostname"/></h1>
+                    </div>
+                    <group>
+                        <group string="Network">
+                            <field name="ip_address"/>
+                            <field name="ip_address_internal"/>
+                            <field name="fqdn"/>
+                            <field name="port"/>
+                        </group>
+                        <group string="Specifications">
+                            <field name="os_type"/>
+                            <field name="os_version"/>
+                            <field name="cpu_cores"/>
+                            <field name="ram_total_gb"/>
+                            <field name="disk_total_gb"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Ownership">
+                            <field name="owner_id"/>
+                            <field name="department_id"/>
+                            <field name="team_ids" widget="many2many_tags"/>
+                        </group>
+                        <group string="Location">
+                            <field name="cloud_provider"/>
+                            <field name="cloud_region"/>
+                            <field name="cloud_instance_type"/>
+                            <field name="datacenter"/>
+                            <field name="rack_number"/>
+                            <field name="cost_per_month"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Live Metrics" name="metrics">
+                            <group>
+                                <group>
+                                    <field name="health_status" widget="badge"/>
+                                    <field name="is_monitored"/>
+                                    <field name="is_idle"/>
+                                    <field name="last_seen"/>
+                                    <field name="uptime_display"/>
+                                </group>
+                                <group>
+                                    <field name="cpu_usage_percent" widget="progressbar"/>
+                                    <field name="ram_usage_percent" widget="progressbar"/>
+                                    <field name="disk_usage_percent" widget="progressbar"/>
+                                    <field name="network_in_mbps"/>
+                                    <field name="network_out_mbps"/>
+                                    <field name="load_average_1m"/>
+                                    <field name="load_average_5m"/>
+                                    <field name="load_average_15m"/>
+                                    <field name="process_count"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="AI Analysis" name="ai">
+                            <group>
+                                <field name="ai_risk_score"/>
+                                <field name="ai_last_analysis"/>
+                            </group>
+                            <group string="AI Summary">
+                                <field name="ai_summary" nolabel="1" colspan="2"/>
+                            </group>
+                            <group string="AI Recommendations">
+                                <field name="ai_recommendation" nolabel="1" colspan="2"/>
+                            </group>
+                            <field name="ai_analysis_ids" readonly="1">
+                                <tree>
+                                    <field name="create_date"/>
+                                    <field name="analysis_type"/>
+                                    <field name="trigger"/>
+                                    <field name="summary"/>
+                                    <field name="risk_score"/>
+                                    <field name="model_used"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Purpose &amp; Tags" name="details">
+                            <group>
+                                <field name="purpose"/>
+                                <field name="tag_ids" widget="many2many_tags"/>
+                            </group>
+                            <field name="description" placeholder="Detailed description of this server..."/>
+                        </page>
+                        <page string="Alerts" name="alerts">
+                            <field name="alert_ids">
+                                <tree decoration-danger="severity == 'critical'" decoration-warning="severity == 'warning'">
+                                    <field name="alert_name"/>
+                                    <field name="severity" widget="badge"/>
+                                    <field name="state" widget="badge"/>
+                                    <field name="started_at"/>
+                                    <field name="resolved_at"/>
+                                    <field name="description"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Allocations" name="allocations">
+                            <field name="allocation_ids">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="requester_id"/>
+                                    <field name="state" widget="badge"/>
+                                    <field name="date_allocated"/>
+                                    <field name="purpose"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Server Kanban View -->
+    <record id="view_server_kanban" model="ir.ui.view">
+        <field name="name">server.monitoring.server.kanban</field>
+        <field name="model">server.monitoring.server</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_small_column">
+                <field name="name"/>
+                <field name="ip_address"/>
+                <field name="health_status"/>
+                <field name="cpu_usage_percent"/>
+                <field name="ram_usage_percent"/>
+                <field name="disk_usage_percent"/>
+                <field name="ai_summary"/>
+                <field name="owner_id"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong><field name="name"/></strong>
+                                    </div>
+                                    <field name="health_status" widget="badge"/>
+                                </div>
+                                <div><small><field name="ip_address"/></small></div>
+                                <div class="mt-2">
+                                    <div>CPU: <field name="cpu_usage_percent" widget="progressbar"/></div>
+                                    <div>RAM: <field name="ram_usage_percent" widget="progressbar"/></div>
+                                    <div>Disk: <field name="disk_usage_percent" widget="progressbar"/></div>
+                                </div>
+                                <div class="mt-2" t-if="record.ai_summary.raw_value">
+                                    <small class="text-muted"><field name="ai_summary"/></small>
+                                </div>
+                                <div class="o_kanban_record_bottom mt-2">
+                                    <div class="oe_kanban_bottom_left">
+                                        <field name="owner_id" widget="many2one_avatar_user"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Server Search View -->
+    <record id="view_server_search" model="ir.ui.view">
+        <field name="name">server.monitoring.server.search</field>
+        <field name="model">server.monitoring.server</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="ip_address"/>
+                <field name="owner_id"/>
+                <field name="department_id"/>
+                <filter string="Active" name="active" domain="[('state', '=', 'active')]"/>
+                <filter string="Healthy" name="healthy" domain="[('health_status', '=', 'healthy')]"/>
+                <filter string="Warning" name="warning" domain="[('health_status', '=', 'warning')]"/>
+                <filter string="Critical" name="critical" domain="[('health_status', '=', 'critical')]"/>
+                <filter string="Idle" name="idle" domain="[('is_idle', '=', True)]"/>
+                <filter string="Unreachable" name="unreachable" domain="[('health_status', '=', 'unreachable')]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="State" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Health" name="group_health" context="{'group_by': 'health_status'}"/>
+                    <filter string="Department" name="group_department" context="{'group_by': 'department_id'}"/>
+                    <filter string="Owner" name="group_owner" context="{'group_by': 'owner_id'}"/>
+                    <filter string="Cloud Provider" name="group_cloud" context="{'group_by': 'cloud_provider'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Server Action -->
+    <record id="action_server_list" model="ir.actions.act_window">
+        <field name="name">Servers</field>
+        <field name="res_model">server.monitoring.server</field>
+        <field name="view_mode">tree,kanban,form</field>
+        <field name="search_view_id" ref="view_server_search"/>
+        <field name="context">{'search_default_active': 1}</field>
+    </record>
+</odoo>

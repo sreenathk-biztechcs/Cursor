@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="module_category_server_monitoring" model="ir.module.category">
+        <field name="name">Server Monitoring</field>
+        <field name="sequence">100</field>
+    </record>
+
+    <record id="group_server_monitoring_user" model="res.groups">
+        <field name="name">User</field>
+        <field name="category_id" ref="module_category_server_monitoring"/>
+        <field name="comment">Can view servers, dashboard, alerts. Can create allocation requests and use AI chat.</field>
+    </record>
+
+    <record id="group_server_monitoring_manager" model="res.groups">
+        <field name="name">Manager</field>
+        <field name="category_id" ref="module_category_server_monitoring"/>
+        <field name="implied_ids" eval="[(4, ref('group_server_monitoring_user'))]"/>
+        <field name="comment">Can approve allocations, modify servers, acknowledge alerts, trigger AI analysis.</field>
+    </record>
+
+    <record id="group_server_monitoring_admin" model="res.groups">
+        <field name="name">Administrator</field>
+        <field name="category_id" ref="module_category_server_monitoring"/>
+        <field name="implied_ids" eval="[(4, ref('group_server_monitoring_manager'))]"/>
+        <field name="comment">Full access including configuration, API keys, and system settings.</field>
+    </record>
+</odoo>

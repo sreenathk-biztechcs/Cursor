@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_allocation_tree" model="ir.ui.view">
+        <field name="name">server.monitoring.allocation.tree</field>
+        <field name="model">server.monitoring.allocation</field>
+        <field name="arch" type="xml">
+            <tree decoration-success="state == 'allocated'"
+                  decoration-danger="state == 'rejected'"
+                  decoration-muted="state == 'returned'">
+                <field name="name"/>
+                <field name="requester_id"/>
+                <field name="server_id"/>
+                <field name="department_id"/>
+                <field name="state" widget="badge"/>
+                <field name="date_submitted"/>
+                <field name="date_allocated"/>
+                <field name="purpose"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_allocation_form" model="ir.ui.view">
+        <field name="name">server.monitoring.allocation.form</field>
+        <field name="model">server.monitoring.allocation</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_submit" string="Submit" type="object"
+                            class="btn-primary" attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+                    <button name="action_approve" string="Approve" type="object"
+                            class="btn-success" attrs="{'invisible': [('state', '!=', 'submitted')]}"
+                            groups="server_monitoring.group_server_monitoring_manager"/>
+                    <button name="action_reject" string="Reject" type="object"
+                            class="btn-danger" attrs="{'invisible': [('state', '!=', 'submitted')]}"
+                            groups="server_monitoring.group_server_monitoring_manager"/>
+                    <button name="action_allocate" string="Allocate Server" type="object"
+                            class="btn-primary" attrs="{'invisible': [('state', '!=', 'approved')]}"
+                            groups="server_monitoring.group_server_monitoring_manager"/>
+                    <button name="action_return" string="Return Server" type="object"
+                            attrs="{'invisible': [('state', '!=', 'allocated')]}"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submitted,approved,allocated"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="requester_id"/>
+                            <field name="department_id"/>
+                            <field name="duration"/>
+                            <field name="end_date" attrs="{'invisible': [('duration', '!=', 'temporary')]}"/>
+                        </group>
+                        <group>
+                            <field name="server_id"/>
+                            <field name="approver_id"/>
+                            <field name="date_submitted"/>
+                            <field name="date_approved"/>
+                            <field name="date_allocated"/>
+                        </group>
+                    </group>
+                    <group string="Purpose">
+                        <field name="purpose" nolabel="1" colspan="2"/>
+                    </group>
+                    <group string="Required Specifications">
+                        <field name="specs_required" nolabel="1" colspan="2"
+                               placeholder="e.g., 8 CPU cores, 32GB RAM, 500GB SSD, Ubuntu 22.04"/>
+                    </group>
+                    <group string="AI Recommendation" attrs="{'invisible': [('ai_recommendation', '=', False)]}">
+                        <field name="ai_recommendation" nolabel="1" colspan="2"/>
+                    </group>
+                    <group string="Notes">
+                        <field name="notes" nolabel="1" colspan="2"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_allocation_list" model="ir.actions.act_window">
+        <field name="name">Allocation Requests</field>
+        <field name="res_model">server.monitoring.allocation</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

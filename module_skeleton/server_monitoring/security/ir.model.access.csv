@@ -1,0 +1,17 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_server_user,server.monitoring.server.user,model_server_monitoring_server,group_server_monitoring_user,1,0,0,0
+access_server_manager,server.monitoring.server.manager,model_server_monitoring_server,group_server_monitoring_manager,1,1,1,0
+access_server_admin,server.monitoring.server.admin,model_server_monitoring_server,group_server_monitoring_admin,1,1,1,1
+access_snapshot_user,server.monitoring.metric.snapshot.user,model_server_monitoring_metric_snapshot,group_server_monitoring_user,1,0,0,0
+access_snapshot_manager,server.monitoring.metric.snapshot.manager,model_server_monitoring_metric_snapshot,group_server_monitoring_manager,1,1,1,1
+access_allocation_user,server.monitoring.allocation.user,model_server_monitoring_allocation,group_server_monitoring_user,1,1,1,0
+access_allocation_manager,server.monitoring.allocation.manager,model_server_monitoring_allocation,group_server_monitoring_manager,1,1,1,1
+access_alert_user,server.monitoring.alert.user,model_server_monitoring_alert,group_server_monitoring_user,1,0,0,0
+access_alert_manager,server.monitoring.alert.manager,model_server_monitoring_alert,group_server_monitoring_manager,1,1,1,1
+access_ai_analysis_user,server.monitoring.ai.analysis.user,model_server_monitoring_ai_analysis,group_server_monitoring_user,1,0,0,0
+access_ai_analysis_admin,server.monitoring.ai.analysis.admin,model_server_monitoring_ai_analysis,group_server_monitoring_admin,1,1,1,1
+access_ai_chat_user,server.monitoring.ai.chat.user,model_server_monitoring_ai_chat,group_server_monitoring_user,1,1,1,0
+access_ai_chat_admin,server.monitoring.ai.chat.admin,model_server_monitoring_ai_chat,group_server_monitoring_admin,1,1,1,1
+access_config_admin,server.monitoring.config.admin,model_server_monitoring_config,group_server_monitoring_admin,1,1,1,1
+access_tag_user,server.monitoring.tag.user,model_server_monitoring_tag,group_server_monitoring_user,1,0,0,0
+access_tag_admin,server.monitoring.tag.admin,model_server_monitoring_tag,group_server_monitoring_admin,1,1,1,1

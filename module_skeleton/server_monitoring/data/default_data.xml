@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Sequence for allocation requests -->
+    <record id="seq_server_allocation" model="ir.sequence">
+        <field name="name">Server Allocation</field>
+        <field name="code">server.monitoring.allocation</field>
+        <field name="prefix">SRV-ALLOC-</field>
+        <field name="padding">4</field>
+    </record>
+</odoo>

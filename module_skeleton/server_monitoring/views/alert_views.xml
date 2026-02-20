@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_alert_tree" model="ir.ui.view">
+        <field name="name">server.monitoring.alert.tree</field>
+        <field name="model">server.monitoring.alert</field>
+        <field name="arch" type="xml">
+            <tree decoration-danger="severity == 'critical'"
+                  decoration-warning="severity == 'warning'"
+                  decoration-muted="state == 'resolved'">
+                <field name="server_id"/>
+                <field name="alert_name"/>
+                <field name="severity" widget="badge"/>
+                <field name="state" widget="badge"/>
+                <field name="started_at"/>
+                <field name="resolved_at"/>
+                <field name="description"/>
+                <field name="acknowledged_by"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_alert_form" model="ir.ui.view">
+        <field name="name">server.monitoring.alert.form</field>
+        <field name="model">server.monitoring.alert</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_acknowledge" string="Acknowledge" type="object"
+                            class="btn-primary" attrs="{'invisible': [('state', '!=', 'firing')]}"
+                            groups="server_monitoring.group_server_monitoring_manager"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="server_id"/>
+                            <field name="alert_name"/>
+                            <field name="severity"/>
+                            <field name="state"/>
+                        </group>
+                        <group>
+                            <field name="started_at"/>
+                            <field name="resolved_at"/>
+                            <field name="acknowledged_by"/>
+                            <field name="acknowledged_at"/>
+                        </group>
+                    </group>
+                    <group string="Description">
+                        <field name="description" nolabel="1" colspan="2"/>
+                    </group>
+                    <group string="AI Analysis" attrs="{'invisible': [('ai_analysis', '=', False)]}">
+                        <field name="ai_analysis" nolabel="1" colspan="2"/>
+                    </group>
+                    <group string="AI Recommended Action" attrs="{'invisible': [('ai_action_taken', '=', False)]}">
+                        <field name="ai_action_taken" nolabel="1" colspan="2"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_alert_list" model="ir.actions.act_window">
+        <field name="name">Alerts</field>
+        <field name="res_model">server.monitoring.alert</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('state', '=', 'firing')]</field>
+        <field name="context">{'search_default_state': 'firing'}</field>
+    </record>
+</odoo>
