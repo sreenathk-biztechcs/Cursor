@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_ai_analysis_tree" model="ir.ui.view">
+        <field name="name">server.monitoring.ai.analysis.tree</field>
+        <field name="model">server.monitoring.ai.analysis</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="create_date"/>
+                <field name="server_id"/>
+                <field name="analysis_type"/>
+                <field name="trigger"/>
+                <field name="summary"/>
+                <field name="risk_score"/>
+                <field name="model_used"/>
+                <field name="tokens_used"/>
+                <field name="cost"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_ai_analysis_form" model="ir.ui.view">
+        <field name="name">server.monitoring.ai.analysis.form</field>
+        <field name="model">server.monitoring.ai.analysis</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="server_id"/>
+                            <field name="analysis_type"/>
+                            <field name="trigger"/>
+                            <field name="risk_score"/>
+                        </group>
+                        <group>
+                            <field name="model_used"/>
+                            <field name="tokens_used"/>
+                            <field name="cost"/>
+                            <field name="create_date"/>
+                        </group>
+                    </group>
+                    <group string="Summary">
+                        <field name="summary" nolabel="1" colspan="2"/>
+                    </group>
+                    <group string="Recommendations">
+                        <field name="recommendations" nolabel="1" colspan="2"/>
+                    </group>
+                    <group string="AI Response (Raw)">
+                        <field name="ai_response" nolabel="1" colspan="2"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_ai_analysis_list" model="ir.actions.act_window">
+        <field name="name">AI Analysis Log</field>
+        <field name="res_model">server.monitoring.ai.analysis</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

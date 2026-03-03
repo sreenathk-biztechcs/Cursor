@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Collect metrics from Prometheus every 5 minutes -->
+    <record id="cron_collect_metrics" model="ir.cron">
+        <field name="name">Server Monitoring: Collect Metrics</field>
+        <field name="model_id" ref="model_server_monitoring_server"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_collect_metrics()</field>
+        <field name="interval_number">5</field>
+        <field name="interval_type">minutes</field>
+        <field name="numbercall">-1</field>
+        <field name="active">True</field>
+    </record>
+
+    <!-- Run AI analysis every 30 minutes -->
+    <record id="cron_ai_analysis" model="ir.cron">
+        <field name="name">Server Monitoring: AI Analysis</field>
+        <field name="model_id" ref="model_server_monitoring_server"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_ai_analysis()</field>
+        <field name="interval_number">30</field>
+        <field name="interval_type">minutes</field>
+        <field name="numbercall">-1</field>
+        <field name="active">True</field>
+    </record>
+
+    <!-- Clean up old metric snapshots daily -->
+    <record id="cron_cleanup_snapshots" model="ir.cron">
+        <field name="name">Server Monitoring: Cleanup Old Snapshots</field>
+        <field name="model_id" ref="model_server_monitoring_server"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_cleanup_snapshots()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="active">True</field>
+    </record>
+</odoo>

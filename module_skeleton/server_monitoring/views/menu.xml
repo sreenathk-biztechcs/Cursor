@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Top-level menu -->
+    <menuitem id="menu_server_monitoring_root"
+              name="Server Monitoring"
+              web_icon="server_monitoring,static/description/icon.png"
+              sequence="100"/>
+
+    <!-- Dashboard -->
+    <menuitem id="menu_dashboard"
+              name="Dashboard"
+              parent="menu_server_monitoring_root"
+              action="action_server_monitoring_dashboard"
+              sequence="1"/>
+
+    <!-- Servers -->
+    <menuitem id="menu_servers"
+              name="Servers"
+              parent="menu_server_monitoring_root"
+              sequence="10"/>
+
+    <menuitem id="menu_servers_all"
+              name="All Servers"
+              parent="menu_servers"
+              action="action_server_list"
+              sequence="1"/>
+
+    <!-- Allocations -->
+    <menuitem id="menu_allocations"
+              name="Allocations"
+              parent="menu_server_monitoring_root"
+              sequence="20"/>
+
+    <menuitem id="menu_allocation_requests"
+              name="Allocation Requests"
+              parent="menu_allocations"
+              action="action_allocation_list"
+              sequence="1"/>
+
+    <!-- Alerts -->
+    <menuitem id="menu_alerts"
+              name="Alerts"
+              parent="menu_server_monitoring_root"
+              sequence="30"/>
+
+    <menuitem id="menu_alerts_active"
+              name="Active Alerts"
+              parent="menu_alerts"
+              action="action_alert_list"
+              sequence="1"/>
+
+    <!-- AI -->
+    <menuitem id="menu_ai"
+              name="AI"
+              parent="menu_server_monitoring_root"
+              sequence="40"/>
+
+    <menuitem id="menu_ai_analysis"
+              name="AI Analysis Log"
+              parent="menu_ai"
+              action="action_ai_analysis_list"
+              sequence="1"/>
+
+    <!-- Configuration -->
+    <menuitem id="menu_config"
+              name="Configuration"
+              parent="menu_server_monitoring_root"
+              groups="group_server_monitoring_admin"
+              sequence="90"/>
+
+    <menuitem id="menu_config_settings"
+              name="Monitoring Settings"
+              parent="menu_config"
+              action="action_monitoring_config"
+              sequence="1"/>
+</odoo>

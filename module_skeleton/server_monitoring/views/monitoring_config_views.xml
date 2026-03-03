@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_monitoring_config_form" model="ir.ui.view">
+        <field name="name">server.monitoring.config.form</field>
+        <field name="model">server.monitoring.config</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group string="Prometheus Configuration">
+                        <field name="prometheus_url"/>
+                        <field name="prometheus_username"/>
+                        <field name="prometheus_password" password="True"/>
+                        <field name="scrape_interval_min"/>
+                        <field name="snapshot_retention_days"/>
+                    </group>
+                    <group string="Grafana (Optional)">
+                        <field name="grafana_url"/>
+                        <field name="grafana_api_key" password="True"/>
+                    </group>
+                    <group string="AI Configuration">
+                        <field name="ai_provider"/>
+                        <field name="ai_api_key" password="True"/>
+                        <field name="ai_model"/>
+                        <field name="ai_base_url" attrs="{'invisible': [('ai_provider', '=', 'openai')]}"/>
+                        <field name="ai_auto_analysis"/>
+                        <field name="ai_analysis_interval_min"/>
+                    </group>
+                    <group string="Alert Webhook">
+                        <field name="alert_webhook_secret" password="True"/>
+                    </group>
+                    <group string="Thresholds">
+                        <group>
+                            <field name="idle_threshold_cpu"/>
+                            <field name="idle_threshold_days"/>
+                        </group>
+                        <group>
+                            <field name="cpu_warning_threshold"/>
+                            <field name="cpu_critical_threshold"/>
+                            <field name="ram_warning_threshold"/>
+                            <field name="disk_warning_threshold"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_monitoring_config" model="ir.actions.act_window">
+        <field name="name">Monitoring Settings</field>
+        <field name="res_model">server.monitoring.config</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+    </record>
+</odoo>
