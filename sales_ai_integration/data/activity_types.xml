@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="activity_type_followup_email" model="mail.activity.type">
+        <field name="name">Follow-up Email</field>
+        <field name="default_user_id" eval="False"/>
+        <field name="res_model">crm.lead</field>
+    </record>
+
+    <record id="activity_type_client_mom" model="mail.activity.type">
+        <field name="name">Client MOM Review</field>
+        <field name="res_model">crm.lead</field>
+    </record>
+
+    <record id="activity_type_presale_email" model="mail.activity.type">
+        <field name="name">Presale Email Draft</field>
+        <field name="res_model">crm.lead</field>
+    </record>
+</odoo>

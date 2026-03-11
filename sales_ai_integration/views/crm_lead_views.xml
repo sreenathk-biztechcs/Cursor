@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_crm_lead_form_sales_ai" model="ir.ui.view">
+        <field name="name">crm.lead.form.sales.ai</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Header buttons -->
+            <xpath expr="//form/header" position="inside">
+                <button name="action_run_lead_scoring"
+                        type="object"
+                        string="Re-score Lead"
+                        class="oe_highlight"
+                        invisible="x_enrichment_done == False"/>
+                <button name="action_start_presale"
+                        type="object"
+                        string="Start Presale"
+                        class="oe_highlight"
+                        invisible="x_presale_status != 'none'"/>
+                <button name="action_request_proposal_from_ai"
+                        type="object"
+                        string="Request Proposal from AI"
+                        class="oe_highlight"
+                        invisible="x_presale_status != 'wbs_done'"/>
+                <button name="action_extract_attachment_texts"
+                        type="object"
+                        string="Sync Attachments for AI"
+                        class="btn-secondary"/>
+            </xpath>
+
+            <!-- AI Data + Presale tabs in notebook -->
+            <xpath expr="//sheet/notebook" position="inside">
+                <page string="AI Data">
+                    <group name="ai_main" string="Lead AI Summary">
+                        <field name="x_lead_quality"/>
+                        <field name="x_lead_score"/>
+                        <field name="x_lead_score_band"/>
+                        <field name="x_apollo_match"/>
+                        <field name="x_followup_stage"/>
+                        <field name="x_reply_intent"/>
+                        <field name="x_last_reply_date"/>
+                    </group>
+                    <group name="ai_enrichment" string="Enrichment (Apollo)">
+                        <field name="x_is_it_company"/>
+                        <field name="x_employee_count"/>
+                        <field name="x_annual_revenue"/>
+                        <field name="x_tech_stack"/>
+                        <field name="x_seniority"/>
+                        <field name="x_is_decision_maker"/>
+                        <field name="x_contact_score"/>
+                        <field name="x_intent_score"/>
+                        <field name="x_linkedin_url" widget="url"/>
+                    </group>
+                </page>
+
+                <page string="Presale" invisible="x_presale_status == 'none'">
+                    <group name="presale_main" string="Presale Status">
+                        <field name="x_presale_status"/>
+                        <field name="x_wbs_sheet_url" widget="url"/>
+                        <field name="x_proposal_drive_url" widget="url"/>
+                        <field name="x_last_agenda_date"/>
+                        <field name="x_retro_logged"/>
+                    </group>
+                    <group name="presale_links" string="Optional Links">
+                        <field name="x_presale_ticket_id"/>
+                    </group>
+                </page>
+            </xpath>
+
+        </field>
+    </record>
+</odoo>

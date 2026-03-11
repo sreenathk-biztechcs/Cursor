@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- 09:00 - AI follow-up email drafter -->
+    <record id="ir_cron_sales_ai_followup_drafts" model="ir.cron">
+        <field name="name">Sales AI - Draft Follow-up Emails</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="state">code</field>
+        <field name="code">model.cron_draft_followup_emails()</field>
+        <field name="interval_type">days</field>
+        <field name="interval_number">1</field>
+        <field name="active">False</field>
+        <field name="nextcall">2026-01-01 09:00:00</field>
+    </record>
+
+    <!-- 10:30 - Daily presale agenda (now on CRM leads, not project.task) -->
+    <record id="ir_cron_sales_ai_presale_agenda" model="ir.cron">
+        <field name="name">Sales AI - Daily Presale Agenda</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="state">code</field>
+        <field name="code">model.cron_generate_presale_agenda()</field>
+        <field name="interval_type">days</field>
+        <field name="interval_number">1</field>
+        <field name="active">False</field>
+        <field name="nextcall">2026-01-01 10:30:00</field>
+    </record>
+</odoo>

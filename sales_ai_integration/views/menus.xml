@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <menuitem id="menu_sales_ai_root"
+              name="Sales AI"
+              parent="base.menu_custom"
+              sequence="50"/>
+
+    <record id="action_sales_ai_icp_wizard" model="ir.actions.act_window">
+        <field name="name">Edit ICP Criteria</field>
+        <field name="res_model">sales.ai.icp.criteria.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_sales_ai_icp"
+              name="ICP Criteria"
+              parent="menu_sales_ai_root"
+              action="action_sales_ai_icp_wizard"/>
+</odoo>
+

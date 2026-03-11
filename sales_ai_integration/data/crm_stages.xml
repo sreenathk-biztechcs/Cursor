@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Canonical CRM stages for inbound pipeline -->
+    <record id="stage_new" model="crm.stage">
+        <field name="name">New</field>
+        <field name="sequence">10</field>
+    </record>
+
+    <record id="stage_qualified" model="crm.stage">
+        <field name="name">Qualified</field>
+        <field name="sequence">20</field>
+    </record>
+
+    <record id="stage_meeting" model="crm.stage">
+        <field name="name">Meeting</field>
+        <field name="sequence">30</field>
+    </record>
+
+    <record id="stage_tech_review" model="crm.stage">
+        <field name="name">Tech Review</field>
+        <field name="sequence">40</field>
+    </record>
+
+    <record id="stage_proposal" model="crm.stage">
+        <field name="name">Proposal</field>
+        <field name="sequence">50</field>
+    </record>
+
+    <record id="stage_negotiation" model="crm.stage">
+        <field name="name">Negotiation</field>
+        <field name="sequence">60</field>
+    </record>
+
+    <record id="stage_won" model="crm.stage">
+        <field name="name">Won</field>
+        <field name="sequence">70</field>
+        <field name="is_won">True</field>
+    </record>
+
+    <record id="stage_lost" model="crm.stage">
+        <field name="name">Lost</field>
+        <field name="sequence">80</field>
+    </record>
+</odoo>
+

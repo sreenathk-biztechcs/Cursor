@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- 08:00 - Human pause escalation checks (overdue drafts, MOMs, WBS, etc.) -->
+    <record id="ir_cron_sales_ai_escalations" model="ir.cron">
+        <field name="name">Sales AI - Human Pause Escalations</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="state">code</field>
+        <field name="code">model.cron_check_human_pause_escalations()</field>
+        <field name="interval_type">days</field>
+        <field name="interval_number">1</field>
+        <field name="active">False</field>
+        <field name="nextcall">2026-01-01 08:00:00</field>
+    </record>
+</odoo>
+

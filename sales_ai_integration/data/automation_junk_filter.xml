@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!--
+        Unified lead intake: on lead creation, send data to n8n
+        for Apollo API enrichment + classification.
+
+        n8n workflow:
+          1. Receives lead data (email, name, domain, company)
+          2. Calls Apollo People Enrichment API (POST /api/v1/people/match)
+          3. Calls Apollo Organization Enrichment API (GET /api/v1/organizations/enrich)
+          4. Calls back Odoo: POST /api/sales_ai/lead_intake_complete
+
+        If n8n is not configured, the action silently skips (logged as warning).
+    -->
+    <!--
+        IMPORTANT: In Odoo 19, base.automation actions are configured via
+        separate ir.actions.server records (no direct 'state'/'code' fields
+        on base.automation). To avoid version conflicts and keep the module
+        installable everywhere, we DO NOT create this automation here.
+
+        You can configure a lead-intake automation from the Odoo UI:
+        Settings → Technical → Automation → Automation Rules.
+    -->
+</odoo>

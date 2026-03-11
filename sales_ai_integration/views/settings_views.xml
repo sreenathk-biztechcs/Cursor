@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_sales_ai_res_config_settings" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.sales_ai_integration</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base_setup.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="AI Sales Automation"
+                     string="AI Sales Automation"
+                     name="sales_automation">
+                <block title="Sales AI">
+                    <group string="Claude AI">
+                        <field name="claude_api_key"/>
+                        <field name="marketing_user_id"/>
+                        <field name="claude_system_prompt" nolabel="1"/>
+                    </group>
+                    <group string="n8n Integration">
+                        <field name="n8n_webhook_base_url"
+                               placeholder="https://n8n.internal/webhook"/>
+                        <group>
+                            <field name="n8n_secret_token"
+                                   class="oe_inline"
+                                   placeholder="X-N8N-Secret header value (Odoo → n8n / JWT secret)"/>
+                            <button name="action_generate_n8n_secret"
+                                    string="Generate Secret"
+                                    type="object"
+                                    class="oe_inline btn-secondary"
+                                    help="Generate a new random shared secret and fill the n8n Header Auth Secret field."/>
+                        </group>
+                        <button name="action_test_n8n_connection"
+                                string="Test n8n Connection"
+                                type="object"
+                                class="btn-primary"
+                                help="Send a test request to the n8n base URL using the configured secret and show the result."/>
+                    </group>
+                    <group string="Apollo API">
+                        <field name="apollo_api_key"/>
+                        <field name="apollo_api_base_url"
+                               placeholder="https://api.apollo.io"/>
+                    </group>
+                    <group string="Lead Scoring &amp; Stale Deals">
+                        <field name="icp_criteria_json" nolabel="1"/>
+                        <field name="stale_thresholds_json" nolabel="1"/>
+                    </group>
+                </block>
+            </app>
+            </xpath>
+        </field>
+    </record>
+</odoo>
+

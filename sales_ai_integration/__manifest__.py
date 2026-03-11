@@ -1,0 +1,45 @@
+{
+    "name": "Sales AI Integration",
+    "summary": "Inbound sales automation on Odoo 19 CE with Claude AI",
+    "version": "19.0.1.0.0",
+    "category": "Sales/CRM",
+    "author": "Internal Odoo Team",
+    "website": "https://example.com",
+    "license": "LGPL-3",
+    "depends": [
+        "base",
+        "crm",
+        "project",
+        "mail",
+        "base_automation",
+        "google_calendar",
+        "google_gmail",
+    ],
+    "data": [
+        "security/ir.model.access.csv",
+        "data/crm_stages.xml",
+        "data/activity_types.xml",
+        "data/automation_junk_filter.xml",
+        "data/cron_jobs.xml",
+        "data/cron_escalations.xml",
+        "views/crm_lead_views.xml",
+        "views/res_users_views.xml",
+        "views/settings_views.xml",
+        "views/menus.xml",
+    ],
+    "demo": [],
+    "installable": True,
+    "application": False,
+    "post_init_hook": "post_init_hook",
+    "external_dependencies": {
+        "python": [
+            "anthropic",
+            "requests",
+            "PyPDF2",
+            "pytesseract",
+            "python-docx",
+            "PyJWT",
+        ]
+    },
+}
+
