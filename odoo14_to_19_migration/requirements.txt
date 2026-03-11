@@ -1,8 +1,0 @@
-# No external dependencies required.
-# The migration tool uses only Python 3 standard library modules:
-#   - xmlrpc.client (XML-RPC connectivity to Odoo)
-#   - json          (ID mapping persistence)
-#   - logging       (structured logging)
-#   - argparse      (CLI argument parsing)
-#
-# Python >= 3.9 recommended (for dict type hints).
