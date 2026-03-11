@@ -1,0 +1,82 @@
+==============================================================================
+AGENT 08 — TICKET GIST (Presale Onboarding Summary)
+Review Owner  : Presale Team Lead
+Review Status : [ ] Pending  [~] In Review  [x] Approved
+Priority      : HIGH — first thing presale team reads on every ticket
+==============================================================================
+
+WHAT THIS AGENT DOES:
+  When a presale ticket is created, Claude reads the ENTIRE lead history
+  (all emails, internal notes, meeting MOMs, enrichment data) and writes
+  a structured summary — the "Gist" — for the presale team.
+
+  Goal: A new presale team member can read the Gist and be fully briefed
+  in 2 minutes without reading through all the emails.
+
+------------------------------------------------------------------------------
+GIST STRUCTURE (what Claude produces):
+------------------------------------------------------------------------------
+
+## Client Overview
+[Company, industry, size, location — 2 sentences]
+
+## What They're Looking For
+[What they want — be specific, use their own words where possible]
+
+## Key Requirements Identified
+[Bulleted list — be concrete, not vague]
+
+## Prior Discussions Summary
+[Timeline of key touchpoints — what was said, what was agreed]
+
+## Open Questions (must resolve in first presale meeting)
+[Numbered list]
+
+## Budget & Timeline Signals
+[What was hinted at — NO specific $ amounts. Describe as "tight/moderate/flexible"]
+
+## Risk Flags
+[Any concerns: vague requirements, decision committee, competitor mentioned, etc.]
+
+## Recommended Presale Approach
+[How to structure the first presale meeting]
+
+------------------------------------------------------------------------------
+REVIEW QUESTIONS FOR PRESALE TEAM:
+------------------------------------------------------------------------------
+
+1. Is this structure right for your presale process?
+   Are there sections you want added or removed?
+   Add sections: _______________________________________________
+   Remove sections: _______________________________________________
+
+2. "Budget & Timeline Signals" — no specific $ amounts. Correct?
+   Or should the internal gist include financial figures?
+
+3. "Recommended Presale Approach" — should Claude suggest this?
+   Or is that too presumptuous and should be left to the presale team?
+
+4. How long should the Gist be?
+   [ ] 200–300 words (very brief)
+   [ ] 400–600 words (current target)
+   [ ] 600–900 words (comprehensive)
+
+5. Should the Gist include a confidence rating on the requirements?
+   (e.g. "Requirement 1: HIGH confidence — clearly stated in email")
+
+6. What is the most important thing the presale team needs to know
+   when they first pick up a ticket?
+   _______________________________________________
+
+7. Are there any internal company terms or classifications we use for
+   presale tickets that Claude should be aware of?
+   _______________________________________________
+
+------------------------------------------------------------------------------
+FEEDBACK / CHANGES REQUESTED:
+------------------------------------------------------------------------------
+
+[Write your feedback here]
+
+
+==============================================================================

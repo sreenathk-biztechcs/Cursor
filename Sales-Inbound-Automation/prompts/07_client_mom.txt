@@ -1,0 +1,97 @@
+==============================================================================
+AGENT 07 — CLIENT MOM (Meeting Minutes + Client Email)
+Review Owner  : Sales Head + 2-3 Senior Reps
+Review Status : [ ] Pending  [~] In Review  [x] Approved
+Priority      : HIGH — sent to client after every discovery meeting
+==============================================================================
+
+WHAT THIS AGENT DOES:
+  After a discovery meeting, Claude reads the transcript and produces:
+  1. INTERNAL MOM  — detailed notes posted to the lead (client never sees)
+  2. CLIENT EMAIL  — professional summary the rep sends to the client
+
+  IMPORTANT: All financial figures are automatically stripped from both documents.
+
+------------------------------------------------------------------------------
+PROMPT FOR INTERNAL MOM (what Claude is told):
+------------------------------------------------------------------------------
+
+Write a comprehensive INTERNAL minutes of meeting for the sales/presale team.
+
+INTERNAL MOM MUST INCLUDE:
+  - Meeting date, duration, attendees (with roles)
+  - Client's key pain points discussed
+  - Our proposed solution / what we showcased
+  - Client's questions and our responses
+  - Client's timeline and urgency signals
+  - Objections raised and how we handled them
+  - Client's decision process / who else is involved
+  - Next steps agreed (numbered)
+  - Action items: [Our team] vs [Client]
+  - Sentiment assessment: Positive / Neutral / Cautious
+
+  Rules:
+  - Max 600 words. Professional, factual, no editorializing.
+  - Strip ALL financial figures. Replace with "[discussed internally]".
+  - Use client's direct quotes where helpful (in quotation marks).
+
+------------------------------------------------------------------------------
+PROMPT FOR CLIENT EMAIL (what Claude is told):
+------------------------------------------------------------------------------
+
+Write a professional summary email to send to the client after the meeting.
+
+CLIENT EMAIL MUST INCLUDE:
+  - Thank the client for their time (1 line only)
+  - What was discussed (2–3 bullet points — high level)
+  - Next steps clearly numbered
+  - Action items for the client
+  - Our team's commitments
+  - Calendar link for next meeting if applicable
+
+  Rules:
+  - Max 400 words.
+  - Tone: warm, clear, action-oriented.
+  - No internal commentary, no financial figures, no speculation.
+  - Plain text — no HTML formatting.
+  - End with rep's name, designation.
+
+------------------------------------------------------------------------------
+REVIEW QUESTIONS FOR SALES / REPS:
+------------------------------------------------------------------------------
+
+1. Is the Internal MOM structure correct? What additional sections do you need?
+   Add your sections here:
+   _______________________________________________
+
+2. For the Client Email — should we always send an MOM?
+   Or only when the client explicitly asked for it?
+
+3. The rule "strip all financial figures" — correct?
+   Or should some financial context be included in the internal MOM?
+
+4. "Sentiment assessment" — is this useful for the presale team to know?
+   What sentiment categories would you want?
+   [ ] Positive / Neutral / Cautious
+   [ ] Hot / Warm / Cold
+   [ ] Other: _______________________________________________
+
+5. Should the client email always include the calendar link for next meeting?
+   Or only if next steps include a meeting?
+
+6. Who should be the sender of the client MOM email?
+   [ ] Always the rep who attended
+   [ ] The most senior person from our team in the meeting
+   [ ] The rep assigned to the lead (may differ from meeting attendee)
+
+7. Is there anything that should NEVER appear in the client email?
+   _______________________________________________
+
+------------------------------------------------------------------------------
+FEEDBACK / CHANGES REQUESTED:
+------------------------------------------------------------------------------
+
+[Write your feedback here]
+
+
+==============================================================================

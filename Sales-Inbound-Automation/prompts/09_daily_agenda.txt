@@ -1,0 +1,82 @@
+==============================================================================
+AGENT 09 — DAILY PRESALE AGENDA (10:30 AM Standup)
+Review Owner  : Presale Team Lead
+Review Status : [ ] Pending  [~] In Review  [x] Approved
+Priority      : MEDIUM — runs daily on all active presale tickets
+==============================================================================
+
+WHAT THIS AGENT DOES:
+  Every morning at 10:00 AM, Claude reads each active presale ticket's
+  recent activity and posts a "today's agenda" note on the ticket.
+  All ticket subscribers receive a notification.
+
+  This replaces the need for the PM/presale lead to manually prep the
+  10:30 AM standup agenda for each deal.
+
+------------------------------------------------------------------------------
+AGENDA STRUCTURE (what Claude produces):
+------------------------------------------------------------------------------
+
+## Daily Agenda — [DATE]
+
+**Status:** [One line: where are we in the presale process?]
+
+**Today's Goal:** [What must be achieved today — be specific]
+
+**Carry-over Items (from last meeting):**
+- [Open action items not yet resolved]
+
+**Questions to Resolve Today:**
+- [Any open questions that need answers]
+
+**Prep Needed Before Next Meeting:** *(only if meeting is today or tomorrow)*
+- [Documents, demos, technical prep required]
+
+**Watch:** [Any risk or blocker that needs attention]
+
+------------------------------------------------------------------------------
+RULES APPLIED:
+------------------------------------------------------------------------------
+- Max 200 words total.
+- Be specific — no generic placeholders like "follow up with client."
+- If all action items are done and next meeting is >3 days away, keep it brief.
+- If no activity for 7+ days and no meeting scheduled: flag as URGENT.
+
+------------------------------------------------------------------------------
+REVIEW QUESTIONS FOR PRESALE TEAM:
+------------------------------------------------------------------------------
+
+1. Is the agenda structure what you'd want for your 10:30 AM standup?
+   What sections would you change?
+
+2. What time should this be posted? Currently: 10:00 AM (so it's ready by 10:30).
+   Preferred time: _______________________________________________
+
+3. Should this run on weekends?
+   [ ] No — only Monday to Friday
+   [ ] Yes — 7 days a week
+
+4. Should urgent tickets get a separate alert to the manager?
+   [ ] Yes — Teams notification to Presale Lead when flagged URGENT
+   [ ] No — the ticket note is sufficient
+
+5. What constitutes an "urgent" flag in our process?
+   Currently: 7+ days no activity + no meeting scheduled.
+   Your threshold: _______________________________________________
+
+6. Should the agenda distinguish between "waiting on client" vs
+   "waiting on our team" action items?
+   [ ] Yes — separate sections for each
+   [ ] No — combined list is fine
+
+7. Who should be subscribed to every presale ticket by default?
+   _______________________________________________
+
+------------------------------------------------------------------------------
+FEEDBACK / CHANGES REQUESTED:
+------------------------------------------------------------------------------
+
+[Write your feedback here]
+
+
+==============================================================================

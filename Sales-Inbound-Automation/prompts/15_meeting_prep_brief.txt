@@ -1,0 +1,88 @@
+==============================================================================
+AGENT 15 — PRE-MEETING BRIEF (For Sales Reps)
+Review Owner  : Sales Head + Senior Reps
+Review Status : [ ] Pending  [~] In Review  [x] Approved
+Priority      : LOW (Phase 3) — nice to have, not critical path
+==============================================================================
+
+WHAT THIS AGENT DOES:
+  2 hours before any scheduled CRM meeting, Claude generates a "prep brief"
+  for the rep. Posted as an internal note on the lead — rep sees it in
+  "My Activities" before the call.
+
+  Goal: Rep walks into the call knowing exactly what to cover, what to ask,
+  and what objections to prepare for.
+
+------------------------------------------------------------------------------
+PREP BRIEF STRUCTURE (what Claude produces):
+------------------------------------------------------------------------------
+
+## Meeting Prep — [CLIENT] — [Meeting Type] — [DATE]
+Duration: X min | Contact: [name, role]
+
+### Client Snapshot (30 seconds)
+[Industry, size, what they do, why they reached out — 3 lines max]
+
+### What They're Trying to Achieve
+[Their stated + inferred goal for this meeting]
+
+### Top 3 Talking Points
+1. [Most important thing to land]
+2. [Second point]
+3. [Third point]
+
+### Likely Objections & How to Handle
+- [Objection]: [Brief handling hint]
+
+### Questions You Must Ask Today
+- [Specific discovery/qualifying questions]
+
+### What Success Looks Like After This Call
+[What's the ideal outcome — next step agreed, requirement clarified, etc.]
+
+### Quick Context Reminder
+[1–2 lines on how we got here — relevant email/prior meeting context]
+
+------------------------------------------------------------------------------
+REVIEW QUESTIONS FOR SALES / REPS:
+------------------------------------------------------------------------------
+
+1. Is this brief useful enough to be worth the automation?
+   Or do reps prefer to prep themselves?
+   [ ] Very useful — please build this
+   [ ] Useful but not priority
+   [ ] Reps prefer to prep themselves — skip this
+
+2. 2 hours before the meeting — is this the right timing?
+   [ ] 24 hours before (allows more prep time)
+   [ ] 2 hours before (current)
+   [ ] 30 minutes before
+
+3. "Likely Objections & How to Handle" — is it useful for Claude to suggest
+   how to handle objections? Or should it just list the objections?
+
+4. "Questions You Must Ask" — should these be personalized per client,
+   or should there be a standard question bank?
+   [ ] Fully personalized (current)
+   [ ] From a standard bank you approve
+   [ ] Combination: standard + personalized additions
+
+5. For a 2nd or 3rd meeting with the same client, should the brief
+   include a "Prior Commitments" section?
+   (e.g., "In the last meeting, you said you'd send them a case study — did you?")
+   [ ] Yes — accountability reminder
+   [ ] No — keep it forward-looking
+
+6. Should the brief include a recommended close move for this meeting?
+   (e.g., "This meeting: close for a presale ticket" or "This meeting: ask for budget approval")
+   [ ] Yes — helpful nudge
+   [ ] No — too prescriptive
+
+------------------------------------------------------------------------------
+FEEDBACK / CHANGES REQUESTED:
+------------------------------------------------------------------------------
+
+[Write your feedback here]
+
+
+==============================================================================

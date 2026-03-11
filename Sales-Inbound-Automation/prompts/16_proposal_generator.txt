@@ -1,0 +1,146 @@
+==============================================================================
+AGENT 16 — PROPOSAL GENERATOR
+Review Owner  : Presale Team Lead + Sales Head (BOTH MUST APPROVE)
+Review Status : [ ] Pending  [~] In Review  [x] Approved
+Priority      : CRITICAL — highest quality output, uses our best AI model (Opus 4.6)
+==============================================================================
+
+WHAT THIS AGENT DOES:
+  When the presale team clicks "Request Proposal from AI" on a ticket
+  (only available at "Ready for Proposal" stage), Claude generates a
+  full sales proposal document.
+
+  The proposal is written to a new Google Docs file, linked to the ticket.
+  The rep reviews, edits, and shares with the client as a PDF.
+
+  NOTE: This uses Claude Opus 4.6 — our highest quality model. It is
+  ~5x more expensive than regular agents. Use only when truly ready.
+
+------------------------------------------------------------------------------
+PROPOSAL PHILOSOPHY (what Claude is told):
+------------------------------------------------------------------------------
+
+Every section must feel written FOR THIS CLIENT — not a template with placeholders.
+Reference their specific requirements, industry, and stated challenges.
+Use the client's own language and terms where possible.
+Answer: "Why you, why now, and why this scope?"
+Tone: confident, professional, consultative — not salesy.
+
+RULES:
+- No buzzwords: "cutting-edge", "state-of-the-art", "revolutionary".
+- No vague promises. Every claim must be specific.
+- Pricing section: use the exact pricing table provided — do not add or modify.
+- Executive Summary: must be strong enough to stand alone (read by a CEO).
+- Language accessible to non-technical stakeholders.
+- Total proposal: 1800–2500 words.
+
+------------------------------------------------------------------------------
+DEFAULT PROPOSAL SECTIONS (adjust to match your template):
+------------------------------------------------------------------------------
+
+  1. Executive Summary
+  2. Understanding Your Requirements
+  3. Our Proposed Solution
+  4. Technical Architecture
+  5. Implementation Approach
+  6. Project Team
+  7. Timeline & Milestones
+  8. Investment
+  9. Why Choose Us
+  10. Next Steps
+
+------------------------------------------------------------------------------
+REVIEW QUESTIONS — PRESALE TEAM:
+------------------------------------------------------------------------------
+
+1. Are these the right sections for our proposal template?
+   Your actual section names (in order):
+   1. _______________________________________________
+   2. _______________________________________________
+   3. _______________________________________________
+   4. _______________________________________________
+   5. _______________________________________________
+   6. _______________________________________________
+   7. _______________________________________________
+   8. _______________________________________________
+   9. _______________________________________________
+   10. _______________________________________________
+
+2. Total length 1800–2500 words — is this right?
+   [ ] Shorter (1000–1500 words) — concise proposals work better for us
+   [ ] Current (1800–2500 words)
+   [ ] Longer (3000+ words) — we write comprehensive proposals
+
+3. "Investment" section — Claude uses the pricing table provided by presale.
+   Should Claude write any explanatory text around the pricing?
+   [ ] Yes — explain what's included, payment terms, etc.
+   [ ] No — just the table, no commentary
+   [ ] Yes, but only include: _______________________________________________
+
+4. "Why Choose Us" section — what are our strongest differentiators?
+   List 3–5 that Claude should reference:
+   a. _______________________________________________
+   b. _______________________________________________
+   c. _______________________________________________
+   d. _______________________________________________
+   e. _______________________________________________
+
+5. Team profiles section — should this be:
+   [ ] Generic (e.g., "Our senior consultant with 8+ years...")
+   [ ] Specific (actual team member names and bios — you provide these)
+   [ ] By role type (e.g., "Project Manager", "Lead Developer", "QA Lead")
+
+6. Should the proposal include a "Terms & Conditions" or legal section?
+   [ ] No — that's a separate contract
+   [ ] Yes — include standard T&Cs
+   [ ] Include a brief "Validity period" line only
+
+7. For the cover page — what should appear?
+   [ ] Just the client name, our company, date
+   [ ] Full cover: client logo (placeholder), client name, our logo, date, prepared by
+   [ ] Other: _______________________________________________
+
+------------------------------------------------------------------------------
+REVIEW QUESTIONS — SALES HEAD:
+------------------------------------------------------------------------------
+
+1. The proposal is AI-generated but ALWAYS reviewed by the rep before sending.
+   Is this process clear to the team? Who is accountable for the final proposal?
+
+2. Should any sections require manager approval before the proposal is sent?
+   [ ] No — rep is responsible
+   [ ] Investment section must be approved by Sales Head
+   [ ] Full proposal needs Sales Head sign-off for deals above $X
+
+3. What tone does our best proposals strike?
+   [ ] Formal and detailed
+   [ ] Conversational and confident
+   [ ] Highly technical
+   [ ] Mix of above — explain: _______________________________________________
+
+4. Are there things Claude should NEVER include in a proposal?
+   _______________________________________________
+
+5. Our standard proposal validity period:
+   [ ] 30 days  [ ] 45 days  [ ] 60 days  [ ] Other: ___
+
+------------------------------------------------------------------------------
+OUR COMPANY PORTFOLIO / CASE STUDIES FOR PROPOSALS:
+------------------------------------------------------------------------------
+
+(Fill in 3–5 reference points Claude can use. Keep vague if needed — no client names.)
+
+1. Industry: _______________ | What we did: _______________ | Outcome: _______________
+2. Industry: _______________ | What we did: _______________ | Outcome: _______________
+3. Industry: _______________ | What we did: _______________ | Outcome: _______________
+4. Industry: _______________ | What we did: _______________ | Outcome: _______________
+5. Industry: _______________ | What we did: _______________ | Outcome: _______________
+
+------------------------------------------------------------------------------
+FEEDBACK / CHANGES REQUESTED:
+------------------------------------------------------------------------------
+
+[Write your feedback here]
+
+
+==============================================================================

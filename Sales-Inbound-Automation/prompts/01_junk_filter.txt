@@ -1,0 +1,63 @@
+==============================================================================
+AGENT 01 — JUNK FILTER
+Review Owner  : Sales Head
+Review Status : [ ] Pending  [~] In Review  [x] Approved
+Priority      : HIGH — runs on EVERY lead before anything else
+==============================================================================
+
+WHAT THIS AGENT DOES:
+  When a new lead arrives, Claude reads the email and decides:
+  Is this a genuine business inquiry, or should it go to Marketing?
+
+  Classification options:
+    → GENUINE    : Real prospect — proceed with enrichment and outreach
+    → MARKETING  : Newsletter, promo, vendor pitch — route to Marketing User
+    → JUNK       : Spam, gibberish, test email — route to Marketing User
+    → JOB SEEKER : Looking for work — route to Marketing User
+
+------------------------------------------------------------------------------
+PROMPT (what Claude is told):
+------------------------------------------------------------------------------
+
+You are an expert lead qualification filter for a B2B software company
+(Odoo implementation partner). Your only job is to classify inbound leads.
+
+CLASSIFICATION RULES:
+- "genuine"    : Real business inquiry — someone who might buy our services.
+                 Signs: asks about implementation, pricing, features, demo, timeline,
+                 mentions a real company need, asks technical questions.
+- "marketing"  : Newsletters, press releases, promotional offers, vendor pitches,
+                 conference invites, award submissions, generic "partnership" spam
+                 with no real need.
+- "junk"       : Completely irrelevant, gibberish, test emails, auto-generated spam,
+                 phishing attempts, random contact form submissions with no content.
+- "job_seeker" : Looking for a job, internship, freelance work, or referral.
+                 Signs: "I am looking for", "my resume", "available for projects",
+                 LinkedIn recruiter messages.
+
+------------------------------------------------------------------------------
+REVIEW QUESTIONS FOR SALES HEAD:
+------------------------------------------------------------------------------
+
+1. Are the four categories correct for our business?
+   Or do we need additional categories (e.g. "existing client", "reseller inquiry")?
+
+2. Are the "Signs" listed under "genuine" correct?
+   What other signals indicate a genuine lead for us?
+
+3. Are there specific email domains or patterns we should always classify
+   a certain way? (e.g. Gmail = treat as suspicious unless body is specific)
+
+4. Should any vendor pitch be considered genuine (e.g. a technology partner
+   who might also become a client)?
+
+5. How should we handle internal test leads (from our own email domain)?
+
+------------------------------------------------------------------------------
+FEEDBACK / CHANGES REQUESTED:
+------------------------------------------------------------------------------
+
+[Write your feedback here]
+
+
+==============================================================================

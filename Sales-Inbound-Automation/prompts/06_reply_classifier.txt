@@ -1,0 +1,72 @@
+==============================================================================
+AGENT 06 — REPLY CLASSIFIER
+Review Owner  : Sales Head
+Review Status : [ ] Pending  [~] In Review  [x] Approved
+Priority      : HIGH — drives automated stage changes and task creation
+==============================================================================
+
+WHAT THIS AGENT DOES:
+  When a client replies to any of our outbound emails, Claude reads the reply
+  and classifies what type of reply it is. This drives automatic actions in
+  Odoo — no rep needs to manually update the CRM.
+
+CLASSIFICATION OPTIONS AND AUTOMATED ACTIONS:
+  ─────────────────────────────────────────────────────────────────────────
+  REPLY TYPE        WHAT ODOO DOES AUTOMATICALLY
+  ─────────────────────────────────────────────────────────────────────────
+  interested        Stop follow-up sequence. Move stage to "Engaged".
+                    Alert rep: "Reply received — they're interested."
+  meeting_booked    Cancel all pending follow-ups. Move to "Meeting Scheduled."
+  not_interested    Move to "Lost" (reason: Not Interested). Stop all outreach.
+  ooo               Pause sequence until their return date. Resume automatically.
+  wrong_person      Create task: "Find correct contact at [Company]."
+  referral          Create note: "Referred by X to contact Y."
+  generic_positive  Reset follow-up cycle. Create activity for rep to reply.
+  unsubscribe       Stop ALL outreach permanently. Tag: "Unsubscribed."
+  question          Flag as urgent. Create activity: "Rep must answer today."
+  negotiating       Move to "Negotiation" stage. Alert rep immediately.
+  ─────────────────────────────────────────────────────────────────────────
+
+------------------------------------------------------------------------------
+PROMPT (what Claude is told):
+------------------------------------------------------------------------------
+
+You are an expert sales email intent classifier. Analyze the incoming reply
+to a B2B sales outreach email and classify its intent precisely.
+
+VALID INTENTS (choose exactly one):
+  interested | not_interested | meeting_booked | ooo
+  wrong_person | referral | generic_positive | unsubscribe
+  question | negotiating
+
+------------------------------------------------------------------------------
+REVIEW QUESTIONS FOR SALES HEAD:
+------------------------------------------------------------------------------
+
+1. Are these 10 categories covering all the replies we typically receive?
+   What types of replies are we missing?
+
+2. "not_interested" → auto-move to Lost. Is this correct?
+   Or should it just stop outreach but keep the lead for marketing to nurture?
+
+3. "ooo" → pause and resume automatically. Is this the right behaviour?
+   What if their OOO doesn't mention a return date?
+
+4. "question" → create urgent activity for rep. Is "urgent / reply today"
+   the right threshold? Or only for HOT leads?
+
+5. "negotiating" → move to Negotiation stage. Does our pipeline have
+   this stage? Or should we use a different stage name?
+   Our stage name for negotiation: _______________________________________________
+
+6. Are there any reply types where we should NEVER take automated action
+   and always ask the rep first?
+
+------------------------------------------------------------------------------
+FEEDBACK / CHANGES REQUESTED:
+------------------------------------------------------------------------------
+
+[Write your feedback here]
+
+
+==============================================================================

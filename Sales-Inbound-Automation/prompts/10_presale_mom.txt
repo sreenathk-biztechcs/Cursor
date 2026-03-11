@@ -1,0 +1,95 @@
+==============================================================================
+AGENT 10 — PRESALE INTERNAL MOM (Post-Presale Meeting)
+Review Owner  : Presale Team Lead
+Review Status : [ ] Pending  [~] In Review  [x] Approved
+Priority      : HIGH — documents every presale meeting on the ticket
+==============================================================================
+
+WHAT THIS AGENT DOES:
+  After each presale meeting, Claude reads the transcript and generates
+  a detailed INTERNAL MOM. This goes to the presale ticket (not the lead).
+  Client never sees this.
+
+  IMPORTANT: Financial figures are stripped. Technical details are kept.
+
+  The ticket # is identified from the transcript — reps say
+  "Moving to ticket 1042" during the meeting as a verbal cue.
+
+------------------------------------------------------------------------------
+PRESALE MOM STRUCTURE (what Claude produces):
+------------------------------------------------------------------------------
+
+## Presale MOM — [TICKET_ID] — [DATE]
+
+**Duration:** X minutes | **Stage:** [stage]
+
+### Attendees
+[List with names, roles, companies]
+
+### Agenda Covered
+[What was actually discussed, numbered]
+
+### Key Requirements Discussed
+[New or refined requirements — be technical and specific]
+
+### Technical Decisions Made
+[Architecture, modules, integrations, platforms confirmed]
+
+### Open Questions Raised
+[Questions not yet answered — include who should answer]
+
+### Action Items
+**Our Team:**
+- [ ] [Task] — Owner: [name] — Due: [next meeting / specific date]
+
+**Client:**
+- [ ] [Task] — Owner: [name] — Due: [next meeting / specific date]
+
+### Prior Items Status
+[Which prior action items were resolved]
+
+### Presale Stage Notes
+[Recommendation: advance / stay / escalate]
+
+------------------------------------------------------------------------------
+REVIEW QUESTIONS FOR PRESALE TEAM:
+------------------------------------------------------------------------------
+
+1. Is the MOM structure correct for your presale process?
+   Sections to add: _______________________________________________
+   Sections to remove: _______________________________________________
+
+2. Financial figures are stripped. Is this correct?
+   Or should the internal MOM include financial context?
+   [ ] Strip all financial figures (current)
+   [ ] Keep financial figures in internal MOM only
+   [ ] Flag them but don't remove them
+
+3. "Stage Recommendation" — should Claude recommend whether to advance
+   the presale stage? Or leave that decision entirely to the presale team?
+
+4. The verbal cue "Moving to ticket XXXX" — is this practical?
+   What if reps forget to say it? Should there be a fallback?
+   Proposed fallback: _______________________________________________
+
+5. Technical decisions section — how specific should Claude be?
+   [ ] Very specific (e.g., "Odoo 17 CE with custom purchase approval module")
+   [ ] High level (e.g., "Odoo purchase module with customization needed")
+
+6. Are there standard action item templates / categories in your presale?
+   (e.g., "Requirements sign-off", "Demo preparation", "Technical assessment")
+   List your standard action item types:
+   _______________________________________________
+
+7. Should the MOM include a "risk level" assessment?
+   [ ] Yes — Red / Amber / Green
+   [ ] No — not needed in MOM
+
+------------------------------------------------------------------------------
+FEEDBACK / CHANGES REQUESTED:
+------------------------------------------------------------------------------
+
+[Write your feedback here]
+
+
+==============================================================================

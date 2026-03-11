@@ -1,0 +1,120 @@
+==============================================================================
+AGENT 05 — FOLLOW-UP EMAIL DRAFTER (Day 2 / Day 5 / Day 10)
+Review Owner  : Sales Head + Senior Reps
+Review Status : [ ] Pending  [~] In Review  [x] Approved
+Priority      : CRITICAL — 3 emails per lead, fully AI-generated
+==============================================================================
+
+WHAT THIS AGENT DOES:
+  If a client doesn't reply after the auto-ack, Claude automatically drafts
+  three follow-up emails on a schedule. The rep reviews and sends each one.
+
+  DEFAULT SCHEDULE (adjust in the ICP scoring form):
+    Hot leads  (90+): Day 1 → Day 3 → Day 7 after auto-ack
+    Warm/Neutral    : Day 2 → Day 5 → Day 10 after auto-ack
+    Cold leads (<50): Day 3 → Day 7 → Day 14 after auto-ack
+
+  KEY RULE: Each follow-up must use a DIFFERENT angle — never repeat what
+  was said in the auto-ack or prior follow-ups.
+
+------------------------------------------------------------------------------
+FOLLOW-UP 1 — Gentle Check-In (Day 2 for warm leads):
+------------------------------------------------------------------------------
+
+PROMPT RULES FOR FOLLOW-UP 1:
+- Assume they were busy, not uninterested.
+- Add ONE new angle not mentioned in the ack (e.g., a specific ROI signal,
+  a relevant industry statistic, or a one-line case study reference).
+- Keep it short: 80–100 words max.
+- End with a soft CTA: "Would it make sense to jump on a 20-min call?"
+- Do NOT resell. Be human.
+
+EXAMPLE STRUCTURE:
+  [Reference something time-relevant or industry-specific]
+  [One new value angle — different from the ack]
+  [Soft CTA + calendar link]
+
+------------------------------------------------------------------------------
+FOLLOW-UP 2 — Value-Driven Nudge (Day 5 for warm leads):
+------------------------------------------------------------------------------
+
+PROMPT RULES FOR FOLLOW-UP 2:
+- Be more specific about their industry or company.
+- Reference one concrete outcome a similar client achieved (keep vague if needed).
+- Ask ONE specific question to prompt a reply — not a yes/no question.
+- 100–130 words max.
+- CTA: suggest a time or share the calendar link.
+
+EXAMPLE STRUCTURE:
+  [Industry-specific insight or stat]
+  [Case study hook — "A [industry] company similar to yours..."]
+  [One open question that makes them think]
+  [Calendar CTA]
+
+------------------------------------------------------------------------------
+FOLLOW-UP 3 — Final Respectful Nudge (Day 10 for warm leads):
+------------------------------------------------------------------------------
+
+PROMPT RULES FOR FOLLOW-UP 3:
+- Acknowledge this is the last nudge — but keep the door open.
+- Softer tone: "I'll leave it here for now, but happy to reconnect when timing works."
+- Offer a reduced ask: "Even 15 minutes would be enough to see if there's a fit."
+- 90–120 words max.
+- No pressure, no guilt. Professional and warm.
+
+EXAMPLE STRUCTURE:
+  [Brief reframe — come from a different angle entirely]
+  [Leave the door open graciously]
+  [Minimal CTA — low commitment]
+
+------------------------------------------------------------------------------
+RULES APPLIED TO ALL 3 FOLLOW-UPS:
+------------------------------------------------------------------------------
+1. Never start with "I wanted to follow up" or "Just checking in."
+2. Each follow-up must use a DIFFERENT angle from all previous emails.
+3. Reference something specific from their original inquiry or company.
+4. No bullet points. No hype. No generic phrases.
+5. Sound like you genuinely believe you can help them — because you do.
+
+------------------------------------------------------------------------------
+REVIEW QUESTIONS FOR SALES / REPS:
+------------------------------------------------------------------------------
+
+1. Are the word limits right? (FU1: 80–100w, FU2: 100–130w, FU3: 90–120w)
+
+2. The schedule: Day 2/5/10 for warm leads. Should it be different?
+   What's worked well for us historically?
+   Your preferred schedule: Day ___ / Day ___ / Day ___
+
+3. After Follow-Up 3 with no response — what should happen?
+   [ ] Mark as "Stale" and stop outreach
+   [ ] Move to a longer re-engagement sequence (Phase 2)
+   [ ] Create a task for the rep to decide
+
+4. Should Follow-Up 3 explicitly say "this is my last email"?
+   [ ] Yes — be transparent
+   [ ] No — just leave the door open without saying it
+
+5. What are the best "value angles" to use in follow-ups?
+   List 3–5 things that have resonated with clients in the past:
+   a. _______________________________________________
+   b. _______________________________________________
+   c. _______________________________________________
+
+6. Are there industries where the follow-up tone/content should differ?
+   (e.g. Manufacturing vs. Retail vs. Healthcare)
+
+7. What case study hooks / proof points should Claude be able to reference?
+   (Keep these generic — no client names needed)
+   a. _______________________________________________
+   b. _______________________________________________
+   c. _______________________________________________
+
+------------------------------------------------------------------------------
+FEEDBACK / CHANGES REQUESTED:
+------------------------------------------------------------------------------
+
+[Write your feedback here]
+
+
+==============================================================================

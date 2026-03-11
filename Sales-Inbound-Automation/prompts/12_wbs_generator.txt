@@ -1,0 +1,100 @@
+==============================================================================
+AGENT 12 — WBS GENERATOR (Work Breakdown Structure)
+Review Owner  : Presale Team Lead + Project Manager
+Review Status : [ ] Pending  [~] In Review  [x] Approved
+Priority      : MEDIUM — generates draft WBS for tech team to estimate
+==============================================================================
+
+WHAT THIS AGENT DOES:
+  When the presale team clicks "Generate WBS" on a presale ticket, Claude
+  reads all the requirements from presale MOMs and generates a full WBS.
+  The WBS is written to your Google Sheets template as a new tab.
+  The tech team then fills in effort estimates.
+
+  Claude follows your existing WBS template phase structure.
+
+------------------------------------------------------------------------------
+WBS OUTPUT STRUCTURE (each task looks like this):
+------------------------------------------------------------------------------
+
+Phase: Phase 1 — Discovery & Gap Analysis
+  Task P1.T1:
+    Name       : Business requirements workshop
+    Description: Facilitate structured requirements sessions with client
+    Owner      : BA / Presale
+    Depends on : — (first task)
+    Effort     : TBD by tech team
+    Deliverable: Signed requirements document
+    Notes      : Critical path item — all subsequent phases depend on this
+
+Phase: Phase 2 — System Design & Prototype
+  Task P2.T1:
+    Name       : Odoo architecture design
+    ...
+
+[And so on for all phases]
+
+------------------------------------------------------------------------------
+DEFAULT PHASES (used if you don't provide your own template):
+------------------------------------------------------------------------------
+  1. Discovery & Gap Analysis
+  2. System Design & Prototype
+  3. Core Development
+  4. Integrations
+  5. UAT & Training
+  6. Go-Live & Hypercare
+
+------------------------------------------------------------------------------
+REVIEW QUESTIONS FOR PRESALE / PM:
+------------------------------------------------------------------------------
+
+1. Are these the right phases for our WBS template?
+   Your actual phases (in order):
+   1. _______________________________________________
+   2. _______________________________________________
+   3. _______________________________________________
+   4. _______________________________________________
+   5. _______________________________________________
+   6. _______________________________________________
+   7. _______________________________________________
+
+2. Task owners — are these the right categories?
+   Currently: Dev | QA | PM | BA | Presale | Client | Joint
+   Add/remove: _______________________________________________
+
+3. Should the WBS include client-side tasks?
+   (e.g., "Client provides master data", "Client completes UAT sign-off")
+   [ ] Yes — always include client tasks
+   [ ] No — WBS is internal only
+
+4. "Effort: TBD by tech team" — is this the right placeholder?
+   Or should Claude attempt a rough estimate (knowing it will be wrong)?
+   [ ] TBD (current) — tech team fills in
+   [ ] Rough estimate (e.g. "3–5 days") that tech team adjusts
+   [ ] Both — AI estimate + "TBD to confirm"
+
+5. How many tasks is the right level of detail?
+   [ ] High level: 20–30 tasks total
+   [ ] Medium: 40–60 tasks total (current target)
+   [ ] Detailed: 70–100+ tasks
+
+6. Should the WBS include a Gantt chart or just the task list?
+   (Currently: just the task list. Gantt would require Phase 2 work)
+
+7. Should the tech team review the WBS before it's sent to the client?
+   [ ] Yes — always internal first
+   [ ] Depends on the size of the deal
+
+8. Any standard tasks that EVERY WBS must include regardless of scope?
+   (e.g., "Project Kickoff", "Weekly status calls", "Handover documentation")
+   List them:
+   _______________________________________________
+
+------------------------------------------------------------------------------
+FEEDBACK / CHANGES REQUESTED:
+------------------------------------------------------------------------------
+
+[Write your feedback here]
+
+
+==============================================================================

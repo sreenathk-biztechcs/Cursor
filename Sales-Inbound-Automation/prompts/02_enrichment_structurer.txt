@@ -1,0 +1,54 @@
+==============================================================================
+AGENT 02 — ENRICHMENT STRUCTURER (Apollo Data → CRM Fields)
+Review Owner  : Sales Head / CRM Admin (low priority — mostly technical)
+Review Status : [ ] Pending  [~] In Review  [x] Approved
+Priority      : MEDIUM — technical agent, less review needed
+==============================================================================
+
+WHAT THIS AGENT DOES:
+  After a lead is classified as Genuine, Playwright scrapes the client's
+  profile from Apollo.io. Claude then takes the raw Apollo data dump and
+  structures it into 30 CRM fields in Odoo.
+
+  This means reps see a pre-filled lead record — no manual data entry.
+
+FIELDS POPULATED (30 total):
+  Company: Industry, Sub-industry, Employee count, Revenue range, HQ country,
+           HQ city, Founded year, Tech stack, Funding stage, LinkedIn URL, Website
+  Contact: Job title, Seniority, Email (verified), Phone, LinkedIn URL,
+           Decision-making authority
+  Lead:    Likely pain point (inferred), ICP match signals, ICP disqualify signals,
+           Inquiry category, Inquiry urgency, Enrichment confidence score,
+           Apollo conversation history, Follow-up angle, and more.
+
+------------------------------------------------------------------------------
+REVIEW QUESTIONS (minimal — this is mostly technical):
+------------------------------------------------------------------------------
+
+1. Are there additional CRM fields in Odoo that we want populated?
+   List any fields in Odoo that aren't covered above:
+   _______________________________________________
+
+2. "Likely pain point" — Claude INFERS this from the inquiry + company profile.
+   Is this inference useful? Or should it only use what the client explicitly said?
+   [ ] Inference is useful (current)
+   [ ] Only use explicitly stated information
+
+3. "Inquiry urgency" — Claude rates as high/medium/low based on language signals.
+   What language signals indicate HIGH urgency for us?
+   (e.g., "go-live in 3 months", "urgent", "already behind schedule")
+   Add signals: _______________________________________________
+
+4. If Apollo has no data for a company (small company, no profile):
+   [ ] Leave fields blank and flag for manual enrichment
+   [ ] Try to infer from the email signature / domain
+   [ ] Both (current)
+
+------------------------------------------------------------------------------
+FEEDBACK / CHANGES REQUESTED:
+------------------------------------------------------------------------------
+
+[Write your feedback here]
+
+
+==============================================================================

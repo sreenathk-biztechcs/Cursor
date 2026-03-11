@@ -1,0 +1,118 @@
+==============================================================================
+AGENT 13 — DEAL RETROSPECTIVE (Won / Lost Analysis)
+Review Owner  : Sales Head
+Review Status : [ ] Pending  [~] In Review  [x] Approved
+Priority      : MEDIUM — runs when every deal closes
+==============================================================================
+
+WHAT THIS AGENT DOES:
+  When a deal is marked Won or Lost in Odoo, Claude reads the entire deal
+  history and writes a retrospective analysis. Posted to the presale ticket
+  (or lead if no ticket).
+
+  Manager receives a Teams notification with a link to the retrospective.
+
+  This replaces the ad-hoc post-mortem meeting and creates a searchable
+  knowledge base of why we win and lose.
+
+------------------------------------------------------------------------------
+RETROSPECTIVE STRUCTURE — WON DEAL:
+------------------------------------------------------------------------------
+
+## Deal Retrospective — WON ✓
+Client: [name] | Deal size: [band] | Closed by: [rep]
+
+### Why We Won
+[3–5 specific reasons based on evidence from the deal history]
+
+### Key Turning Points
+[Moments in the deal that made the difference]
+
+### What Worked Well
+- Approach / messaging / timing / technical fit
+
+### Client's Primary Decision Driver
+[#1 reason they chose us — based on evidence, not assumption]
+
+### Deal Velocity Analysis
+[X days from lead to close. Which stages were quick, which were slow?]
+
+### What to Replicate for Similar Leads
+[Specific, actionable advice for the next similar deal]
+
+### Risk That Almost Derailed the Deal
+[Any close calls — what nearly went wrong]
+
+------------------------------------------------------------------------------
+RETROSPECTIVE STRUCTURE — LOST DEAL:
+------------------------------------------------------------------------------
+
+## Deal Retrospective — LOST ✗
+Client: [name] | Deal size: [band] | Rep: [rep]
+
+### Most Likely Reason We Lost
+[Based on the evidence — not just the rep's stated reason]
+
+### Early Warning Signals (that we missed or ignored)
+[Signals from emails/meetings that indicated risk — in hindsight]
+
+### Where the Deal Stalled
+[Stage with longest delay and why]
+
+### What Could Have Been Done Differently
+[Specific, actionable — per stage if possible]
+
+### Competitor / Alternative Analysis
+[Any competitor mentioned? What might they have offered differently?]
+
+### Price / Scope / Timing Sensitivity
+[Was this a price issue, scope mismatch, or timing problem?]
+
+### Should We Have Disqualified Earlier?
+[Honest assessment — did we spend too long on a poor-fit lead?]
+
+------------------------------------------------------------------------------
+REVIEW QUESTIONS FOR SALES HEAD:
+------------------------------------------------------------------------------
+
+1. Is the Won retrospective structure correct?
+   What additional sections would you want for won deals?
+   _______________________________________________
+
+2. Is the Lost retrospective structure correct?
+   What additional sections for lost deals?
+   _______________________________________________
+
+3. "Most Likely Reason We Lost" — Claude infers this from conversation history,
+   not just what the rep reported. Is this helpful or potentially misleading?
+   [ ] Helpful — Claude's inference is valuable even if imperfect
+   [ ] Use only the rep's stated reason
+   [ ] Include both: rep's reason + Claude's inference
+
+4. Should the retrospective be shared with the full team or just the manager?
+   [ ] Manager only
+   [ ] Manager + rep
+   [ ] Full sales team (anonymized)
+
+5. The deal size is shown as "band" (small/medium/large) not actual amount.
+   Is this correct? Or should the retro include actual deal value (internally)?
+
+6. Should Claude identify patterns across multiple retros?
+   (e.g., "This is the 3rd deal lost to competitor X this quarter")
+   This would require a Phase 2 feature. Is it worth building?
+   [ ] Yes — very valuable
+   [ ] Not a priority
+
+7. What should trigger the retrospective?
+   [ ] Automatically when deal is marked Won/Lost (current)
+   [ ] Only when rep fills in the win/loss reason field first
+   [ ] Within 24 hours of close (gives rep time to add notes)
+
+------------------------------------------------------------------------------
+FEEDBACK / CHANGES REQUESTED:
+------------------------------------------------------------------------------
+
+[Write your feedback here]
+
+
+==============================================================================

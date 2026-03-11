@@ -1,0 +1,133 @@
+==============================================================================
+AGENT 03 — LEAD SCORING
+Review Owner  : Sales Head (MANDATORY) + Presale Lead
+Review Status : [ ] Pending  [~] In Review  [x] Approved
+Priority      : CRITICAL — determines follow-up urgency and rep priority
+==============================================================================
+
+WHAT THIS AGENT DOES:
+  After a lead is enriched with Apollo data, Claude scores it 0–100
+  against our Ideal Customer Profile (ICP). The score determines:
+    - Follow-up timing (hot leads get faster follow-ups)
+    - Rep notification priority
+    - Whether to recommend disqualification
+
+  Score bands:
+    90–100 → HOT 🔥   (Day 1/3/7 follow-ups)
+    70–89  → WARM      (Day 2/5/10 follow-ups)
+    50–69  → NEUTRAL   (Day 2/5/10 follow-ups)
+    0–49   → COLD      (Day 3/7/14 follow-ups, flag for review)
+
+------------------------------------------------------------------------------
+SCORING CRITERIA (THIS IS WHAT NEEDS YOUR INPUT):
+------------------------------------------------------------------------------
+
+The scoring is split across 6 categories. The weights below are DEFAULT —
+your sales team must adjust them to match your actual ICP.
+
+  CATEGORY                    MAX POINTS    WHAT CLAUDE CHECKS
+  ─────────────────────────────────────────────────────────────────────────
+  Industry fit                25 pts        Does their industry match our targets?
+  Company size (employees)    20 pts        Are they the right size company?
+  Revenue range               15 pts        Is their revenue in our target band?
+  Contact seniority           15 pts        Are we talking to a decision maker?
+  Geography                   10 pts        Are they in our target countries?
+  Inquiry intent              10 pts        How specific and urgent is their ask?
+  Disqualifiers             –20 pts max     Competitor, blacklisted, wrong fit?
+  ─────────────────────────────────────────────────────────────────────────
+  TOTAL                       100 pts
+
+------------------------------------------------------------------------------
+PROMPT (what Claude is told — the scoring logic):
+------------------------------------------------------------------------------
+
+You are an expert B2B sales analyst. Score this inbound lead against
+the provided ICP (Ideal Customer Profile) criteria.
+
+SCORING BREAKDOWN (must sum to the total score):
+- Industry fit:       0–25 pts  (how well industry/sub-industry matches targets)
+- Company size fit:   0–20 pts  (employee count within target range)
+- Revenue fit:        0–15 pts  (revenue range within target)
+- Contact seniority:  0–15 pts  (seniority level match with target titles)
+- Geography fit:      0–10 pts  (HQ country in target list)
+- Inquiry intent:     0–10 pts  (specificity and urgency of their ask)
+- Disqualifiers:      –20 pts max (each disqualifier found reduces score)
+
+BAND THRESHOLDS:
+- 90–100: hot
+- 70–89:  warm
+- 50–69:  neutral
+- 0–49:   cold
+
+------------------------------------------------------------------------------
+ICP CRITERIA FORM (FILL THIS IN — used to configure the scoring agent):
+------------------------------------------------------------------------------
+
+This is the actual ICP config that gets passed to Claude. Fill in your values:
+
+TARGET INDUSTRIES (list in order of preference, 1 = best fit):
+  1. _______________________________________________
+  2. _______________________________________________
+  3. _______________________________________________
+  4. _______________________________________________
+  5. _______________________________________________
+  Industries to EXCLUDE (never a fit): _____________________
+
+TARGET COMPANY SIZE (employee count):
+  Minimum: ___________  Maximum: ___________
+  Sweet spot (ideal): ___________
+
+TARGET ANNUAL REVENUE:
+  Minimum: ___________  Maximum: ___________
+
+TARGET CONTACT SENIORITY (tick all that apply):
+  [ ] C-Level (CEO, COO, CFO, CTO, MD)
+  [ ] VP / Country Head
+  [ ] Director
+  [ ] Manager
+  [ ] IT Head / ERP Manager
+  [ ] Other: _______________
+
+TARGET GEOGRAPHIES (countries we want to serve):
+  Primary  : _______________________________________________
+  Secondary: _______________________________________________
+  Exclude  : _______________________________________________
+
+DISQUALIFYING SIGNALS (if found, reduce score significantly):
+  [ ] Email from a competitor domain
+  [ ] Company is a direct competitor
+  [ ] Contact is a student / academic
+  [ ] Company has fewer than _____ employees
+  [ ] Specific blacklisted domains: _______________________
+  Other: __________________________________________________
+
+WHAT MAKES A "HOT" LEAD REGARDLESS OF SCORE?
+  (e.g. "If they mention a specific go-live date within 3 months"):
+  _______________________________________________
+  _______________________________________________
+
+------------------------------------------------------------------------------
+REVIEW QUESTIONS FOR SALES HEAD:
+------------------------------------------------------------------------------
+
+1. Are the category weights correct? (Industry 25 pts, Size 20 pts, etc.)
+   If industry fit matters more than size for us, should it be 35 pts?
+
+2. Should "inquiry urgency" (they have a go-live date, or say "urgent")
+   carry more weight? Currently at 10 pts max.
+
+3. Are there any instant-hot signals we want to hardcode?
+   (e.g. "Any manufacturing company with 200+ employees = auto Hot")
+
+4. Score < 20 = suggest disqualify. Is this threshold right for us?
+
+------------------------------------------------------------------------------
+FEEDBACK / CHANGES REQUESTED:
+------------------------------------------------------------------------------
+
+[Write your feedback here]
+
+ICP FORM (filled):
+
+
+==============================================================================

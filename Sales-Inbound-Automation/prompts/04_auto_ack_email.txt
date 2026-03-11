@@ -1,0 +1,103 @@
+==============================================================================
+AGENT 04 — AUTO-ACKNOWLEDGMENT EMAIL
+Review Owner  : Sales Head + 2-3 Senior Reps
+Review Status : [ ] Pending  [~] In Review  [x] Approved
+Priority      : CRITICAL — first impression to every new client
+==============================================================================
+
+WHAT THIS AGENT DOES:
+  Within minutes of a lead being assigned to a rep, Claude drafts a
+  personalized acknowledgment email. The rep reviews it in "My Activities"
+  and sends it (or edits then sends).
+
+  This email is the client's FIRST experience of our company. It must feel
+  like it was written by a real person who read their email carefully.
+
+------------------------------------------------------------------------------
+PROMPT (what Claude is told):
+------------------------------------------------------------------------------
+
+You are a senior B2B sales rep at [COMPANY NAME], an Odoo implementation
+partner. Your task is to draft the very first reply to an inbound lead inquiry.
+
+MANDATORY RULES:
+1. Max 150 words in the email body. Every word must earn its place.
+2. Open by acknowledging something SPECIFIC from their actual inquiry —
+   never a generic "Thanks for reaching out."
+3. Add exactly ONE relevant value angle (not already in their inquiry).
+4. Include the rep's calendar link with a natural CTA.
+5. End with the rep's name and designation.
+6. NO hype words: "revolutionary", "cutting-edge", "game-changer", "excited".
+7. NO bullet points. Flowing prose only.
+8. Tone: warm, confident, professional — like a trusted advisor, not a vendor.
+
+------------------------------------------------------------------------------
+EXAMPLE OUTPUT (for reference — Claude will generate unique versions):
+------------------------------------------------------------------------------
+
+Subject: Re: Odoo ERP for Acme Manufacturing
+
+Hi Sarah,
+
+Your question about managing multi-warehouse inventory across three locations
+in Odoo is exactly the kind of challenge we help mid-sized manufacturers solve.
+We recently helped a similar company in the building materials space reduce
+their warehouse reconciliation time by 60% after moving from a legacy ERP.
+
+I'd love to understand your current setup and see if there's a good fit.
+Here's my calendar — even 20 minutes would give us a clear picture:
+[CALENDAR LINK]
+
+Looking forward to it,
+Raj Mehta
+Account Executive, [Company Name]
+
+------------------------------------------------------------------------------
+REVIEW QUESTIONS FOR SALES / REPS:
+------------------------------------------------------------------------------
+
+1. Is 150 words the right limit? (Should it be shorter / longer?)
+
+2. "NO bullet points" — do you agree? Some reps prefer bullet-pointed acks.
+
+3. The rule "open with something SPECIFIC from their inquiry" — is this
+   always possible? What should Claude do if the inquiry is very vague
+   (e.g. "I want to know more about your services")?
+
+4. Should we include a company intro line? Or keep it purely about them?
+
+5. For HOT leads (score 90+), the agent is more direct about suggesting a
+   specific time slot. Is this the right behaviour?
+
+6. Are there industries or lead types where the tone should be different?
+   (e.g. Government clients might need a more formal tone)
+
+7. What are the "value angles" Claude should pick from?
+   List 3–5 of our strongest value props / case study hooks:
+   a. _______________________________________________
+   b. _______________________________________________
+   c. _______________________________________________
+   d. _______________________________________________
+   e. _______________________________________________
+
+------------------------------------------------------------------------------
+OUR COMPANY VALUE PROP (fill in — used in auto-ack):
+------------------------------------------------------------------------------
+
+Company name (as it should appear in emails):
+_______________________________________________
+
+One-liner about what we do:
+_______________________________________________
+
+Portfolio line (one sentence, no specifics needed):
+_______________________________________________
+
+------------------------------------------------------------------------------
+FEEDBACK / CHANGES REQUESTED:
+------------------------------------------------------------------------------
+
+[Write your feedback here — you can rewrite the rules above if needed]
+
+
+==============================================================================

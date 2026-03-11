@@ -1,0 +1,93 @@
+==============================================================================
+AGENT 11 — PRESALE CLIENT EMAIL (Post-Presale Meeting)
+Review Owner  : Presale Team Lead + 1-2 Senior Presale Consultants
+Review Status : [ ] Pending  [~] In Review  [x] Approved
+Priority      : HIGH — sent to client after every presale meeting
+==============================================================================
+
+WHAT THIS AGENT DOES:
+  After the internal presale MOM is generated, Claude drafts the client-facing
+  summary email. This goes to the CRM lead for rep review before sending.
+
+  This is DIFFERENT from the discovery meeting MOM (Agent 07):
+  - This is after PRESALE meetings (technical, scoping discussions)
+  - The audience may include technical decision makers
+  - Language can be slightly more technical than discovery MOM
+
+------------------------------------------------------------------------------
+CLIENT EMAIL STRUCTURE (what Claude produces):
+------------------------------------------------------------------------------
+
+Subject: [Meeting summary: Client Company — Date]
+
+Hi [Client Name],
+
+Thank you for today's session. Here's a quick summary of what we covered
+and the next steps for both teams.
+
+**What we covered:**
+[2–3 bullet points — high level topics discussed]
+
+**Action items for your team:**
+1. [Client action item 1]
+2. [Client action item 2]
+
+**Our commitments to you:**
+1. [Our action item 1]
+2. [Our action item 2]
+
+**Next step:** [Proposed next meeting or milestone]
+
+[Calendar link if applicable]
+
+Best regards,
+[Rep Name]
+[Designation]
+
+------------------------------------------------------------------------------
+RULES APPLIED:
+------------------------------------------------------------------------------
+- Max 300 words.
+- No internal commentary, no financial figures.
+- Plain text only — no HTML.
+- Language accessible to non-technical stakeholders (e.g. CFO might read this).
+
+------------------------------------------------------------------------------
+REVIEW QUESTIONS FOR PRESALE TEAM:
+------------------------------------------------------------------------------
+
+1. Is the email structure right? Should it be more or less formal?
+
+2. Should the email explicitly mention what was NOT covered/decided?
+   (e.g., "Scope for Module X is still open — we'll address this next session")
+   [ ] Yes — transparency is helpful
+   [ ] No — only cover what was decided
+
+3. For presale emails, should we include a link to shared documents?
+   (e.g., Google Drive folder with requirement docs)
+   [ ] Yes — always include
+   [ ] Only when there are shared documents
+   [ ] No — keep it simple
+
+4. Should the email mention the next meeting date/time or just the calendar link?
+   [ ] Always propose a specific date and time
+   [ ] Just share the calendar link
+   [ ] Depends on whether next meeting is confirmed
+
+5. Who should send this email?
+   [ ] Always the rep (even if presale consultant attended)
+   [ ] The presale consultant who attended
+   [ ] The most senior person from our team
+
+6. For the subject line — is "[Meeting summary: Company — Date]" correct?
+   Your preferred subject line format:
+   _______________________________________________
+
+------------------------------------------------------------------------------
+FEEDBACK / CHANGES REQUESTED:
+------------------------------------------------------------------------------
+
+[Write your feedback here]
+
+
+==============================================================================

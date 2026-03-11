@@ -1,0 +1,80 @@
+==============================================================================
+AGENT 14 — NO-SHOW FOLLOW-UP EMAIL
+Review Owner  : Sales Head + Senior Reps
+Review Status : [ ] Pending  [~] In Review  [x] Approved
+Priority      : MEDIUM
+==============================================================================
+
+WHAT THIS AGENT DOES:
+  When a rep marks a meeting as "No Show" in Odoo, Claude drafts a brief,
+  gracious follow-up email. The tone changes based on how many times
+  the client has no-showed.
+
+  1ST NO-SHOW: Completely understanding. "Things come up." Easy reschedule.
+  2ND NO-SHOW: Warm but note this is the second attempt. Ask if priority changed.
+  3RD+ NO-SHOW: Very gentle. Offer to pause outreach if timing isn't right.
+
+------------------------------------------------------------------------------
+RULES APPLIED:
+------------------------------------------------------------------------------
+- Max 120 words.
+- Never say "you missed our meeting" — say "we didn't get to connect."
+- Include a calendar link for easy reschedule.
+- No guilt, no passive aggression.
+- Sound like a real person.
+
+------------------------------------------------------------------------------
+EXAMPLE OUTPUT — 1st no-show:
+------------------------------------------------------------------------------
+
+Subject: Didn't get to connect today
+
+Hi [Name],
+
+Looks like today's timing didn't work out — completely understandable.
+Would love to find a slot that works better for you.
+
+Here's my calendar in case it's easier to pick directly:
+[CALENDAR LINK]
+
+Happy to also reschedule via email if you have a preferred time.
+
+Best,
+[Rep Name]
+[Designation]
+
+------------------------------------------------------------------------------
+REVIEW QUESTIONS FOR SALES / REPS:
+------------------------------------------------------------------------------
+
+1. Is 120 words the right limit? Or should it be shorter (60–80 words)?
+   Your preference: _______________________________________________
+
+2. Is the tone calibration right?
+   1st = understanding | 2nd = probe intent | 3rd = offer to pause
+   Would you handle the 2nd and 3rd differently?
+   _______________________________________________
+
+3. After 3 no-shows from a HOT lead (score 90+), should we escalate to
+   the manager before sending the 3rd follow-up?
+   [ ] Yes — get manager involved
+   [ ] No — rep handles it
+
+4. Should we offer an alternative meeting format for repeat no-shows?
+   (e.g., "Happy to do a quick async video or send info via email instead")
+   [ ] Yes — offer alternatives
+   [ ] No — stick to the meeting
+
+5. After 3 no-shows with no response — what happens?
+   [ ] Move to Lost (reason: No Response)
+   [ ] Move to cold nurture (stop active outreach)
+   [ ] Rep decides
+
+------------------------------------------------------------------------------
+FEEDBACK / CHANGES REQUESTED:
+------------------------------------------------------------------------------
+
+[Write your feedback here]
+
+
+==============================================================================
