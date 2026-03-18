@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
+    <!-- 08:00 - Meeting prep brief (MeetingPrepBriefAgent, 24h lookahead) -->
+    <record id="ir_cron_sales_ai_meeting_prep_brief" model="ir.cron">
+        <field name="name">Sales AI - Meeting Prep Brief</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="state">code</field>
+        <field name="code">model.cron_meeting_prep_brief()</field>
+        <field name="interval_type">days</field>
+        <field name="interval_number">1</field>
+        <field name="active">False</field>
+        <field name="nextcall">2026-01-01 08:00:00</field>
+    </record>
+
     <!-- 09:00 - AI follow-up email drafter -->
     <record id="ir_cron_sales_ai_followup_drafts" model="ir.cron">
         <field name="name">Sales AI - Draft Follow-up Emails</field>
@@ -12,7 +24,18 @@
         <field name="nextcall">2026-01-01 09:00:00</field>
     </record>
 
-    <!-- 10:30 - Daily presale agenda (now on CRM leads, not project.task) -->
+    <!-- Every 30 min - Request meeting transcripts ~1h after meetings end -->
+    <record id="ir_cron_sales_ai_transcript_request" model="ir.cron">
+        <field name="name">Sales AI - Request Meeting Transcripts</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="state">code</field>
+        <field name="code">model.cron_request_meeting_transcripts()</field>
+        <field name="interval_type">minutes</field>
+        <field name="interval_number">30</field>
+        <field name="active">False</field>
+    </record>
+
+    <!-- 10:30 - Daily presale agenda (DailyAgendaAgent on crm.lead) -->
     <record id="ir_cron_sales_ai_presale_agenda" model="ir.cron">
         <field name="name">Sales AI - Daily Presale Agenda</field>
         <field name="model_id" ref="crm.model_crm_lead"/>

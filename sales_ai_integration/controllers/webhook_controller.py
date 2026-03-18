@@ -3,10 +3,11 @@ import json
 import base64
 import hmac
 import hashlib
+import threading
 
 from dateutil.relativedelta import relativedelta
 
-from odoo import http, fields
+from odoo import http, fields, SUPERUSER_ID
 from odoo.http import request
 
 _logger = logging.getLogger("sales_ai")
@@ -73,7 +74,7 @@ def _check_n8n_auth(headers) -> bool:
 # To generate the Odoo API key:
 #   Settings → Technical → API Keys → New → copy the key into n8n.
 # The key is bound to a dedicated "n8n Service" Odoo user with only the
-# rights needed by these endpoints (read/write crm.lead, project.task).
+# rights needed by these endpoints (read/write crm.lead).
 # ---------------------------------------------------------------------------
 
 
@@ -91,6 +92,39 @@ class SalesAiWebhookController(http.Controller):
     """
 
     # -----------------------------------------------------------------
+    # PING — reverse-direction health check (n8n → Odoo)
+    # -----------------------------------------------------------------
+
+    @http.route(
+        "/odoo/api/sales_ai/ping",
+        type="jsonrpc",
+        auth="api_key",
+        methods=["POST"],
+        csrf=False,
+    )
+    def ping(self, **payload):
+        """
+        Lightweight endpoint for n8n to verify the reverse connection
+        (n8n → Odoo) during the bidirectional handshake.
+
+        n8n calls this with:
+            POST /api/sales_ai/ping
+            Authorization: Bearer <odoo_api_key>
+            {"ping": true}
+
+        Response:
+            {"status": "pong", "odoo_version": "19.0", "timestamp": "..."}
+        """
+        ICP = request.env["ir.config_parameter"].sudo()
+        ICP.set_param("sales_ai.n8n_reverse_status", "ok")
+        _logger.info("sales_ai: [PING] Reverse ping from n8n — OK")
+        return {
+            "status": "pong",
+            "odoo_version": "19.0",
+            "timestamp": fields.Datetime.now(),
+        }
+
+    # -----------------------------------------------------------------
     # UNIFIED LEAD INTAKE (Apollo enrichment + classification)
     # -----------------------------------------------------------------
     # n8n flow:
@@ -100,51 +134,98 @@ class SalesAiWebhookController(http.Controller):
     #   4. n8n calls THIS endpoint with combined results
 
     @http.route(
-        "/api/sales_ai/lead_intake_complete",
-        type="json",
-        auth="api_key",
+        "/odoo/api/sales_ai/lead_intake_complete",
+        type="http",
+        auth="none",
         methods=["POST"],
         csrf=False,
     )
-    def lead_intake_complete(self, **payload):
+    def lead_intake_complete(self, **kw):
         """
         Unified callback after n8n queries Apollo APIs.
+
+        n8n sends plain JSON (not JSON-RPC), so this uses type="http".
 
         Expected payload:
         {
             "lead_id": int,
-            "apollo_match": bool,        // true if Apollo found a person match
-            "apollo_person": {...},       // Apollo People Enrichment response (or {})
-            "apollo_organization": {...}, // Apollo Org Enrichment response (or {})
+            "apollo_match": bool,
+            "apollo_person": {...},
+            "apollo_organization": {...},
         }
         """
+        def _json_resp(data, status=200):
+            return request.make_response(
+                json.dumps(data),
+                headers=[("Content-Type", "application/json")],
+                status=status,
+            )
+
+        if not _check_n8n_auth(request.httprequest.headers):
+            _logger.warning("sales_ai: Unauthorized lead_intake_complete call")
+            return _json_resp({"error": "unauthorized"}, 401)
+
+        try:
+            data = json.loads(request.httprequest.get_data(as_text=True) or "{}")
+        except (json.JSONDecodeError, Exception):
+            data = {}
+
+        if isinstance(data, dict) and isinstance(data.get("params"), dict):
+            payload = data["params"]
+        else:
+            payload = data if isinstance(data, dict) else {}
+
         lead_id = payload.get("lead_id")
         if not lead_id:
-            return {"error": "missing_lead_id"}
+            return _json_resp({"error": "missing_lead_id"}, 400)
 
         lead = request.env["crm.lead"].sudo().browse(int(lead_id))
         if not lead.exists():
             _logger.warning("sales_ai: lead_intake_complete — lead %s not found", lead_id)
-            return {"error": "lead_not_found"}
+            return _json_resp({"error": "lead_not_found"}, 404)
 
+        if lead.x_enrichment_done:
+            _logger.info(
+                "sales_ai: lead_intake_complete for lead %s — already enriched via synchronous path, skipping",
+                lead_id,
+            )
+            return _json_resp({"status": "ok", "note": "already_enriched"})
+
+        # n8n may send either:
+        # - apollo_person / apollo_organization
+        # - OR only apollo_result with nested person/org (older flow)
         apollo_person = payload.get("apollo_person") or {}
         apollo_org = payload.get("apollo_organization") or {}
-        apollo_match = payload.get("apollo_match", False)
+        if not (apollo_person or apollo_org):
+            apollo_result = payload.get("apollo_result") or {}
+            if isinstance(apollo_result, dict):
+                apollo_person = apollo_result.get("person") or apollo_result or {}
+                apollo_org = apollo_result.get("organization") or {}
+
+        apollo_match = payload.get("apollo_match")
+        # If match flag is missing or empty, infer it from the presence of Apollo data
+        if apollo_match in (None, "", "unknown"):
+            apollo_match = bool(apollo_person or apollo_org)
 
         _logger.info(
-            "sales_ai: lead_intake_complete received for lead %s (match=%s)",
-            lead_id, apollo_match,
+            "sales_ai: lead_intake_complete received for lead %s (match=%s, force_full_intake=%s)",
+            lead_id, apollo_match, payload.get("force_full_intake"),
         )
-        lead.action_lead_intake_complete(apollo_person, apollo_org, apollo_match)
-        return {"status": "ok"}
+        lead.action_lead_intake_complete(
+            apollo_person,
+            apollo_org,
+            bool(apollo_match),
+            force_full_intake=bool(payload.get("force_full_intake")),
+        )
+        return _json_resp({"status": "ok"})
 
     # -----------------------------------------------------------------
     # LEGACY: receive_apollo_data (backward compat)
     # -----------------------------------------------------------------
 
     @http.route(
-        "/api/sales_ai/receive_apollo_data",
-        type="json",
+        "/odoo/api/sales_ai/receive_apollo_data",
+        type="jsonrpc",
         auth="api_key",
         methods=["POST"],
         csrf=False,
@@ -171,8 +252,8 @@ class SalesAiWebhookController(http.Controller):
     # -----------------------------------------------------------------
 
     @http.route(
-        "/api/sales_ai/receive_transcript",
-        type="json",
+        "/odoo/api/sales_ai/receive_transcript",
+        type="jsonrpc",
         auth="api_key",
         methods=["POST"],
         csrf=False,
@@ -192,11 +273,72 @@ class SalesAiWebhookController(http.Controller):
             lead_id, meeting_type, len(transcript),
         )
 
+        # Run MOM generation in background thread — return response immediately.
+        from ..models.crm_lead import _bg_client_mom_worker
+
+        dbname = request.env.cr.dbname
+
         if meeting_type == "client":
-            lead.action_generate_client_mom(transcript)
+            mom_kwargs = {
+                "transcript": transcript,
+                "meeting_date": payload.get("meeting_date") or "",
+                "meeting_duration": int(payload.get("meeting_duration") or 0),
+                "attendees": payload.get("attendees") or [],
+            }
+            t = threading.Thread(
+                target=_bg_client_mom_worker,
+                args=(dbname, SUPERUSER_ID, int(lead_id), mom_kwargs),
+                name="bg-mom-%s" % lead_id,
+            )
+            t.start()
         elif meeting_type == "presale":
-            # For presale meetings, generate presale client email
-            lead.action_generate_presale_client_email(mom_content=transcript)
+            lead.action_generate_presale_mom_from_transcript(
+                transcript=transcript,
+                meeting_date=payload.get("meeting_date"),
+                meeting_duration=payload.get("meeting_duration"),
+                attendees=payload.get("attendees") or [],
+                prior_open_items=payload.get("prior_open_items") or [],
+            )
+        return {"status": "ok", "async": meeting_type == "client"}
+
+    # -----------------------------------------------------------------
+    # STRUCTURED ENRICHMENT WRITE-BACK (EnrichmentStructurerAgent)
+    # -----------------------------------------------------------------
+
+    @http.route(
+        "/odoo/api/sales_ai/enrichment_structured",
+        type="jsonrpc",
+        auth="api_key",
+        methods=["POST"],
+        csrf=False,
+    )
+    def enrichment_structured(self, **payload):
+        """
+        Endpoint for n8n / EnrichmentStructurerAgent to POST structured
+        enrichment JSON back to Odoo.
+
+        Expected payload:
+        {
+          "lead_id": int,
+          "enrichment": { ... }  # JSON keys as defined by EnrichmentStructurerAgent
+        }
+        """
+        lead_id = payload.get("lead_id")
+        enrichment = payload.get("enrichment") or {}
+        if not lead_id or not isinstance(enrichment, dict):
+            return {"error": "missing_lead_or_enrichment"}
+
+        lead = request.env["crm.lead"].sudo().browse(int(lead_id))
+        if not lead.exists():
+            _logger.warning("sales_ai: enrichment_structured — lead %s not found", lead_id)
+            return {"error": "lead_not_found"}
+
+        _logger.info(
+            "sales_ai: enrichment_structured received for lead %s (keys=%s)",
+            lead_id,
+            list(enrichment.keys()),
+        )
+        lead.action_apply_structured_enrichment(enrichment)
         return {"status": "ok"}
 
     # -----------------------------------------------------------------
@@ -204,8 +346,8 @@ class SalesAiWebhookController(http.Controller):
     # -----------------------------------------------------------------
 
     @http.route(
-        "/api/sales_ai/proposal_ready",
-        type="json",
+        "/odoo/api/sales_ai/proposal_ready",
+        type="jsonrpc",
         auth="api_key",
         methods=["POST"],
         csrf=False,
@@ -235,8 +377,8 @@ class SalesAiWebhookController(http.Controller):
     # -----------------------------------------------------------------
 
     @http.route(
-        "/api/sales_ai/wbs_ready",
-        type="json",
+        "/odoo/api/sales_ai/wbs_ready",
+        type="jsonrpc",
         auth="api_key",
         methods=["POST"],
         csrf=False,
@@ -266,13 +408,14 @@ class SalesAiWebhookController(http.Controller):
     # -----------------------------------------------------------------
 
     @http.route(
-        "/api/sales_ai/presale_mom_posted",
-        type="json",
+        "/odoo/api/sales_ai/presale_mom_posted",
+        type="jsonrpc",
         auth="api_key",
         methods=["POST"],
         csrf=False,
     )
     def presale_mom_posted(self, **payload):
+        """n8n callback: presale MOM text available. Posts to lead + triggers presale email draft."""
         lead_id = payload.get("lead_id")
         mom_content = payload.get("mom_content") or ""
         if not lead_id:
@@ -281,6 +424,11 @@ class SalesAiWebhookController(http.Controller):
         if not lead.exists():
             return {"error": "lead_not_found"}
 
+        if mom_content:
+            lead.message_post(
+                body="<b>Presale MOM (from n8n)</b><br/><pre>%s</pre>" % mom_content[:5000],
+                subtype_xmlid="mail.mt_note",
+            )
         _logger.info("sales_ai: Presale MOM posted for lead %s", lead_id)
         lead.action_generate_presale_client_email(mom_content=mom_content)
         return {"status": "ok"}
@@ -290,8 +438,8 @@ class SalesAiWebhookController(http.Controller):
     # -----------------------------------------------------------------
 
     @http.route(
-        "/api/sales_ai/stale_deals",
-        type="json",
+        "/odoo/api/sales_ai/stale_deals",
+        type="jsonrpc",
         auth="api_key",
         methods=["GET", "POST"],
         csrf=False,
@@ -335,8 +483,8 @@ class SalesAiWebhookController(http.Controller):
     # ------------------------------------------------------------------
 
     @http.route(
-        "/api/enrich_lead",
-        type="json",
+        "/odoo/api/enrich_lead",
+        type="jsonrpc",
         auth="none",
         methods=["POST"],
         csrf=False,
@@ -389,7 +537,7 @@ class SalesAiWebhookController(http.Controller):
                 f"{base_url}/v1/mixed_people/search",
                 json=search_body,
                 headers=headers,
-                timeout=15,
+                timeout=90,
             )
             resp.raise_for_status()
             data = resp.json()
@@ -423,7 +571,7 @@ class SalesAiWebhookController(http.Controller):
                     f"{base_url}/v1/accounts/search",
                     json=org_body,
                     headers=headers,
-                    timeout=15,
+                    timeout=90,
                 )
                 resp.raise_for_status()
                 org_data = resp.json()
@@ -505,13 +653,356 @@ class SalesAiWebhookController(http.Controller):
         _logger.info("New lead %s created from Apollo/Claude enrichment", new_lead.id)
         return {"status": "created", "lead_id": new_lead.id}
 
+    # -----------------------------------------------------------------
+    # CALENDLY / CALENDAR EVENT CREATED
+    # -----------------------------------------------------------------
+
+    @http.route(
+        "/odoo/api/sales_ai/calendar_event_create",
+        type="jsonrpc",
+        auth="api_key",
+        methods=["POST"],
+        csrf=False,
+    )
+    def calendar_event_create(self, **payload):
+        """
+        Called by n8n when a Calendly booking is created.
+
+        Expected payload:
+        {
+            "lead_id": int,
+            "event_name": str,
+            "start_datetime": str,   ISO datetime
+            "duration_minutes": int,
+            "invitee_name": str,
+            "invitee_email": str,
+            "calendly_event_id": str,
+            "calendly_event_url": str,
+        }
+        """
+        lead_id = payload.get("lead_id")
+        if not lead_id:
+            # Try to find lead by invitee email
+            email = (payload.get("invitee_email") or "").strip()
+            if email:
+                lead = request.env["crm.lead"].sudo().search(
+                    [("email_from", "=ilike", email), ("active", "=", True)], limit=1
+                )
+                if lead:
+                    lead_id = lead.id
+
+        if not lead_id:
+            _logger.warning("sales_ai: calendar_event_create — no lead_id and no email match")
+            return {"error": "no_lead_found"}
+
+        lead = request.env["crm.lead"].sudo().browse(int(lead_id))
+        if not lead.exists():
+            return {"error": "lead_not_found"}
+
+        start_dt = payload.get("start_datetime", "")
+        event_name = payload.get("event_name") or "Meeting"
+        invitee = payload.get("invitee_name") or lead.contact_name or ""
+        calendly_url = payload.get("calendly_event_url") or ""
+
+        # Post note on lead
+        note_html = (
+            "<p><b>Meeting scheduled via Calendly:</b> %s</p>"
+            "<p><b>Invitee:</b> %s &lt;%s&gt;</p>"
+            "<p><b>Start:</b> %s</p>"
+            "%s"
+        ) % (
+            event_name, invitee, payload.get("invitee_email") or "",
+            start_dt,
+            ("<p><a href='%s'>Calendly event</a></p>" % calendly_url) if calendly_url else "",
+        )
+        lead.message_post(body=note_html, subtype_xmlid="mail.mt_note")
+
+        # Update lead stage to "Meeting Scheduled" if it exists
+        meeting_stage = request.env["crm.stage"].sudo().search(
+            [("name", "ilike", "meeting")], limit=1
+        )
+        if meeting_stage:
+            lead.stage_id = meeting_stage
+
+        _logger.info(
+            "sales_ai: Calendar event created for lead %s — %s at %s",
+            lead_id, event_name, start_dt,
+        )
+        return {"status": "ok", "lead_id": lead_id}
+
+    # -----------------------------------------------------------------
+    # MEETING DONE (transcript ready)
+    # -----------------------------------------------------------------
+
+    @http.route(
+        "/odoo/api/sales_ai/meeting_done",
+        type="http",
+        auth="none",
+        methods=["POST"],
+        csrf=False,
+    )
+    def meeting_done(self):
+        """
+        Called by n8n after a client meeting transcript is ready.
+        Accepts plain JSON POST (Content-Type: application/json).
+
+        Accepts TWO formats:
+
+        **Format A – Apollo Transcript Service webhook** (preferred):
+        {
+            "lead_id": int,
+            "job_id": "53",
+            "status": "completed",
+            "data": {
+                "meeting_title": str,
+                "conversation_id": str,
+                "conversation_url": str,
+                "segments": [{"speaker": str, "text": str, "timestamp": str}, ...],
+                "extracted_at": str,
+                "extraction_method": str
+            }
+        }
+
+        **Format B – flat / legacy**:
+        {
+            "lead_id": int,
+            "transcript": str,
+            "meeting_date": str,
+            "meeting_duration": int,
+            "attendees": [...],
+            "conversation_id": str,
+            "meeting_name": str,
+            "source": str
+        }
+        """
+        try:
+            raw_body = request.httprequest.get_data(as_text=True)
+            payload = json.loads(raw_body) if raw_body else {}
+        except (json.JSONDecodeError, Exception) as exc:
+            _logger.error("sales_ai: [MEETING-DONE] invalid JSON: %s", exc)
+            return request.make_json_response({"error": "invalid_json"}, status=400)
+
+        # Unwrap n8n envelope (list / body / params wrappers)
+        if isinstance(payload, list):
+            payload = payload[0] if payload else {}
+        if "body" in payload and isinstance(payload.get("body"), dict):
+            payload = payload["body"]
+        elif "params" in payload and isinstance(payload.get("params"), dict) and payload["params"]:
+            payload = payload["params"]
+
+        if not _check_n8n_auth(request.httprequest.headers):
+            _logger.warning("sales_ai: [MEETING-DONE] unauthorized")
+            return request.make_json_response({"error": "unauthorized"}, status=401)
+
+        # Extract lead_id: top-level OR from odoo_payload.payload.lead_id
+        odoo_payload = payload.get("odoo_payload") or {}
+        odoo_inner = odoo_payload.get("payload") or {} if isinstance(odoo_payload, dict) else {}
+        lead_id = payload.get("lead_id") or odoo_inner.get("lead_id")
+        if not lead_id:
+            _logger.warning("sales_ai: [MEETING-DONE] missing lead_id")
+            return request.make_json_response({"error": "missing_lead_id"}, status=400)
+
+        # Detect Apollo format (has "data.segments") vs legacy flat
+        apollo_data = payload.get("data") or {}
+        segments = apollo_data.get("segments") if isinstance(apollo_data, dict) else None
+
+        if segments and isinstance(segments, list):
+            transcript = self._segments_to_transcript(segments)
+            conversation_id = apollo_data.get("conversation_id") or ""
+            conversation_url = apollo_data.get("conversation_url") or ""
+            speakers = list({seg.get("speaker") for seg in segments if seg.get("speaker")})
+
+            meeting_name = (
+                odoo_inner.get("meeting_name")
+                or apollo_data.get("meeting_title")
+                or ""
+            )
+            source = odoo_inner.get("source") or "apollo"
+            meeting_date = odoo_inner.get("meeting_start", "")[:10] if odoo_inner.get("meeting_start") else ""
+            meeting_start = odoo_inner.get("meeting_start") or ""
+            meeting_stop = odoo_inner.get("meeting_stop") or ""
+            meeting_duration = int(payload.get("meeting_duration") or 0)
+            if not meeting_duration and meeting_start and meeting_stop:
+                try:
+                    from datetime import datetime
+                    fmt = "%Y-%m-%d %H:%M:%S"
+                    dt_start = datetime.strptime(meeting_start, fmt)
+                    dt_stop = datetime.strptime(meeting_stop, fmt)
+                    meeting_duration = int((dt_stop - dt_start).total_seconds() / 60)
+                except Exception:
+                    pass
+
+            odoo_participants = odoo_inner.get("participants") or []
+            attendees = [{"name": n, "is_client": True} for n in odoo_participants]
+            if not attendees:
+                attendees = [{"name": s, "is_client": True} for s in speakers]
+
+            _logger.info(
+                "sales_ai: [MEETING-DONE] apollo format — lead=%s, segments=%d, transcript=%d chars",
+                lead_id, len(segments), len(transcript),
+            )
+        else:
+            transcript = payload.get("transcript") or ""
+            meeting_name = payload.get("meeting_name") or ""
+            conversation_id = payload.get("conversation_id") or ""
+            conversation_url = payload.get("conversation_url") or ""
+            source = payload.get("source") or "meeting_done"
+            attendees = payload.get("attendees") or []
+            meeting_date = payload.get("meeting_date") or ""
+            meeting_duration = int(payload.get("meeting_duration") or 0)
+            _logger.info(
+                "sales_ai: [MEETING-DONE] legacy format — lead=%s, transcript=%d chars",
+                lead_id, len(transcript),
+            )
+
+        if not transcript:
+            _logger.warning("sales_ai: [MEETING-DONE] empty transcript for lead %s", lead_id)
+            return request.make_json_response({"error": "empty_transcript"}, status=400)
+
+        lead = request.env["crm.lead"].with_user(SUPERUSER_ID).browse(int(lead_id))
+        if not lead.exists():
+            _logger.warning("sales_ai: [MEETING-DONE] lead %s not found", lead_id)
+            return request.make_json_response({"error": "lead_not_found"}, status=404)
+
+        # Spawn background thread so n8n gets a fast response — MOM generation
+        # (Claude call + chatter + activity) happens asynchronously.
+        from ..models.crm_lead import _bg_client_mom_worker
+
+        mom_kwargs = {
+            "transcript": transcript,
+            "meeting_date": meeting_date,
+            "meeting_duration": meeting_duration,
+            "attendees": attendees,
+            "conversation_id": conversation_id,
+            "conversation_url": conversation_url,
+            "source": source,
+            "meeting_name": meeting_name,
+            "request_payload_json": json.dumps(payload, ensure_ascii=False),
+        }
+        dbname = request.env.cr.dbname
+        t = threading.Thread(
+            target=_bg_client_mom_worker,
+            args=(dbname, SUPERUSER_ID, int(lead_id), mom_kwargs),
+            name="bg-mom-%s" % lead_id,
+        )
+        t.start()
+
+        _logger.info(
+            "sales_ai: [MEETING-DONE] background MOM thread spawned for lead %s", lead_id,
+        )
+        return request.make_json_response({"status": "ok", "async": True})
+
+    @staticmethod
+    def _segments_to_transcript(segments):
+        """Convert Apollo segments list to a readable transcript string.
+
+        Input:  [{"speaker": "Alice", "text": "Hello", "timestamp": "00:01"}, ...]
+        Output: "[00:01] Alice: Hello\n[00:02] Bob: Hi\n..."
+        """
+        lines = []
+        for seg in segments:
+            ts = seg.get("timestamp") or ""
+            speaker = seg.get("speaker") or "Unknown"
+            text = seg.get("text") or ""
+            if ts:
+                lines.append(f"[{ts}] {speaker}: {text}")
+            else:
+                lines.append(f"{speaker}: {text}")
+        return "\n".join(lines)
+
+    # -----------------------------------------------------------------
+    # MEETING NO-SHOW
+    # -----------------------------------------------------------------
+
+    @http.route(
+        "/odoo/api/sales_ai/meeting_no_show",
+        type="jsonrpc",
+        auth="api_key",
+        methods=["POST"],
+        csrf=False,
+    )
+    def meeting_no_show(self, **payload):
+        """
+        Called by n8n when a scheduled meeting has no-show (Calendly detects cancellation
+        or rep marks it manually).
+
+        Expected payload:
+        {
+            "lead_id": int,
+            "no_show_count": int,   1 = first no-show, 2 = second, etc.
+        }
+        """
+        lead_id = payload.get("lead_id")
+        if not lead_id:
+            return {"error": "missing_lead_id"}
+
+        lead = request.env["crm.lead"].sudo().browse(int(lead_id))
+        if not lead.exists():
+            return {"error": "lead_not_found"}
+
+        no_show_count = int(payload.get("no_show_count") or 1)
+        _logger.info(
+            "sales_ai: Meeting no-show for lead %s (count=%d)", lead_id, no_show_count
+        )
+        lead.action_no_show_followup(no_show_count=no_show_count)
+        return {"status": "ok"}
+
+    # -----------------------------------------------------------------
+    # PRESALE TRANSCRIPT (routes to ticket or lead)
+    # -----------------------------------------------------------------
+
+    @http.route(
+        "/odoo/api/sales_ai/presale_transcript",
+        type="jsonrpc",
+        auth="api_key",
+        methods=["POST"],
+        csrf=False,
+    )
+    def presale_transcript(self, **payload):
+        """
+        Called by n8n "Presale MOM Splitter" workflow after a presale meeting.
+        Routes the transcript directly to the lead — no project.task involved.
+
+        Expected payload:
+        {
+            "lead_id": int,
+            "transcript": str,
+            "meeting_date": str,        ISO date
+            "meeting_duration": int,    minutes
+            "attendees": [...],
+            "prior_open_items": [...],
+        }
+        """
+        lead_id = payload.get("lead_id")
+        transcript = payload.get("transcript") or ""
+
+        if not lead_id or not transcript:
+            return {"error": "missing_lead_or_transcript"}
+
+        lead = request.env["crm.lead"].sudo().browse(int(lead_id))
+        if not lead.exists():
+            return {"error": "lead_not_found"}
+
+        _logger.info(
+            "sales_ai: Presale transcript for lead %s — ref %s (%d chars)",
+            lead_id, lead.x_presale_ref or "no-ref", len(transcript),
+        )
+        lead.action_generate_presale_mom_from_transcript(
+            transcript=transcript,
+            meeting_date=payload.get("meeting_date"),
+            meeting_duration=payload.get("meeting_duration"),
+            attendees=payload.get("attendees") or [],
+            prior_open_items=payload.get("prior_open_items") or [],
+        )
+        return {"status": "ok", "lead_id": lead_id, "presale_ref": lead.x_presale_ref}
+
     # ------------------------------------------------------------------
     # MOM activity creation – transcript + attachment extracts
     # ------------------------------------------------------------------
 
     @http.route(
-        "/api/create_mom_activity",
-        type="json",
+        "/odoo/api/create_mom_activity",
+        type="jsonrpc",
         auth="none",
         methods=["POST"],
         csrf=False,

@@ -4,7 +4,7 @@ from typing import Any, Dict, Optional, Union
 
 from odoo import api, models
 
-_logger = logging.getLogger(__name__)
+_logger = logging.getLogger("sales_ai")  # unified logger — grep 'sales_ai' in odoo.log
 
 
 class ClaudeService(models.AbstractModel):
@@ -36,7 +36,11 @@ class ClaudeService(models.AbstractModel):
         """Return an Anthropic client instance or None if not configured."""
         api_key = self._get_api_key()
         if not api_key:
-            _logger.warning("Claude API key not configured (sales_ai.claude_api_key).")
+            _logger.error(
+                "sales_ai: [CONFIG ERROR] Claude API key is NOT set. "
+                "Fix: Settings → Technical → System Parameters → sales_ai.claude_api_key. "
+                "All AI classification, scoring, and email generation will be SKIPPED until this is set."
+            )
             return None
         try:
             from anthropic import Anthropic
@@ -94,6 +98,29 @@ class ClaudeService(models.AbstractModel):
                 text_parts.append(text)
 
         raw = "\n".join(text_parts).strip()
+
+        # Retry once if response is empty and JSON was expected (transient API issue)
+        if not raw and expect_json:
+            _logger.warning(
+                "Claude returned empty response for tier=%s; retrying once...", tier
+            )
+            try:
+                resp = client.messages.create(
+                    model=model_name,
+                    max_tokens=max_tokens,
+                    temperature=temperature,
+                    system=system_prompt or None,
+                    messages=[{"role": "user", "content": user_message}],
+                )
+                text_parts = []
+                for block in resp.content:
+                    text = getattr(block, "text", None) or getattr(block, "value", None)
+                    if text:
+                        text_parts.append(text)
+                raw = "\n".join(text_parts).strip()
+            except Exception as retry_exc:
+                _logger.error("Claude retry also failed: %s", retry_exc)
+
         if not expect_json:
             return raw
 
@@ -107,7 +134,7 @@ class ClaudeService(models.AbstractModel):
             return json.loads(fenced)
         except Exception as exc:
             _logger.error("Failed to parse JSON from Claude response: %s", exc)
-            _logger.debug("Raw JSON candidate: %s", raw)
+            _logger.debug("Raw JSON candidate (first 500 chars): %.500s", raw)
             return {}
 
     @api.model

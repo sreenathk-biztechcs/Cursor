@@ -1,6 +1,10 @@
+import logging
+
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 
+
+_logger = logging.getLogger("sales_ai")
 
 class SalesAiSettings(models.TransientModel):
     _inherit = "res.config.settings"
@@ -25,6 +29,16 @@ class SalesAiSettings(models.TransientModel):
         config_parameter="sales_ai.n8n_webhook_base_url",
         help="Base URL for n8n webhooks, e.g. https://n8n.internal/webhook",
     )
+    n8n_environment = fields.Selection(
+        [
+            ("live", "Live"),
+            ("test", "Test"),
+        ],
+        string="n8n Environment",
+        config_parameter="sales_ai.n8n_environment",
+        default="live",
+        help="Controls whether Odoo calls the live or test n8n webhook endpoints.",
+    )
     n8n_secret_token = fields.Char(
         string="n8n Header Auth Secret (Odoo → n8n)",
         config_parameter="sales_ai.n8n_secret_token",
@@ -44,11 +58,69 @@ class SalesAiSettings(models.TransientModel):
             "Can be the same value as the Header Auth Secret or a separate one."
         ),
     )
+    # --- Bidirectional handshake fields (n8n → Odoo callback) ---
+    odoo_base_url = fields.Char(
+        string="Odoo Base URL (for n8n callbacks)",
+        config_parameter="sales_ai.odoo_base_url",
+        help=(
+            "The public URL of this Odoo instance that n8n will use to call back. "
+            "e.g. https://myodoo.company.com  — n8n appends /api/sales_ai/* paths to this."
+        ),
+    )
+    odoo_api_key = fields.Char(
+        string="Odoo API Key (for n8n → Odoo)",
+        config_parameter="sales_ai.odoo_api_key",
+        help=(
+            "Odoo API key that n8n uses in the Authorization: Bearer header "
+            "when calling back into Odoo. Generate one from Settings → Technical → API Keys."
+        ),
+    )
+    n8n_status = fields.Selection(
+        [
+            ("ok", "Connected"),
+            ("error", "Error"),
+            ("unknown", "Unknown"),
+        ],
+        string="n8n Connection Status",
+        config_parameter="sales_ai.n8n_status",
+        help="Last known connection status to n8n.",
+        readonly=True,
+    )
+    n8n_last_ok = fields.Datetime(
+        string="n8n Last Successful Handshake",
+        config_parameter="sales_ai.n8n_last_ok",
+        readonly=True,
+    )
+    n8n_last_error = fields.Char(
+        string="n8n Last Error",
+        config_parameter="sales_ai.n8n_last_error",
+        readonly=True,
+    )
+    n8n_reverse_status = fields.Selection(
+        [
+            ("ok", "Connected"),
+            ("error", "Error"),
+            ("unknown", "Unknown"),
+        ],
+        string="n8n → Odoo Status",
+        config_parameter="sales_ai.n8n_reverse_status",
+        help="Whether n8n successfully verified the reverse connection to Odoo.",
+        readonly=True,
+    )
     stale_thresholds_json = fields.Char(
         string="Stale Deal Thresholds (JSON)",
         config_parameter="sales_ai.stale_thresholds_json",
         help="JSON mapping of stage names to days before a deal is considered stale, "
         'e.g. {"Qualified": 7, "Meeting": 10, "Proposal": 14}.',
+    )
+    public_holidays_json = fields.Char(
+        string="Public Holidays (JSON list of YYYY-MM-DD)",
+        config_parameter="sales_ai.public_holidays_json",
+        help=(
+            "List of public holidays used by Sales AI to skip non-working days "
+            "when scheduling follow-ups. Example: "
+            '["2026-01-01", "2026-01-26", "2026-08-15"].'
+        ),
     )
     apollo_api_key = fields.Char(
         string="Apollo API Key",
@@ -66,25 +138,6 @@ class SalesAiSettings(models.TransientModel):
         help="Optional global system prompt used for generic Claude tasks.",
     )
 
-    def action_generate_n8n_secret(self):
-        """Generate a new random shared secret for n8n header/JWT auth."""
-        import secrets
-
-        ICP = self.env["ir.config_parameter"].sudo()
-        new_secret = secrets.token_urlsafe(48)
-        ICP.set_param("sales_ai.n8n_secret_token", new_secret)
-        self.n8n_secret_token = new_secret
-        return {
-            "type": "ir.actions.client",
-            "tag": "display_notification",
-            "params": {
-                "title": "n8n Secret Generated",
-                "type": "success",
-                "message": "A new n8n header/JWT secret has been generated.",
-                "sticky": False,
-            },
-        }
-
     @api.model
     def get_values(self):
         res = super().get_values()
@@ -101,14 +154,33 @@ class SalesAiSettings(models.TransientModel):
             n8n_webhook_base_url=ICP.get_param(
                 "sales_ai.n8n_webhook_base_url", default=""
             ),
+            n8n_environment=ICP.get_param(
+                "sales_ai.n8n_environment", default="live"
+            ),
             n8n_secret_token=ICP.get_param(
                 "sales_ai.n8n_secret_token", default=""
             ),
             n8n_hmac_secret=ICP.get_param(
                 "sales_ai.n8n_hmac_secret", default=""
             ),
+            odoo_base_url=ICP.get_param(
+                "sales_ai.odoo_base_url",
+                default=ICP.get_param("web.base.url", default=""),
+            ),
+            odoo_api_key=ICP.get_param(
+                "sales_ai.odoo_api_key", default=""
+            ),
+            n8n_status=ICP.get_param("sales_ai.n8n_status", default="unknown"),
+            n8n_last_ok=ICP.get_param("sales_ai.n8n_last_ok", default=False),
+            n8n_last_error=ICP.get_param("sales_ai.n8n_last_error", default=""),
+            n8n_reverse_status=ICP.get_param(
+                "sales_ai.n8n_reverse_status", default="unknown"
+            ),
             stale_thresholds_json=ICP.get_param(
                 "sales_ai.stale_thresholds_json", default="{}"
+            ),
+            public_holidays_json=ICP.get_param(
+                "sales_ai.public_holidays_json", default="[]"
             ),
         )
         return res
@@ -137,51 +209,182 @@ class SalesAiSettings(models.TransientModel):
         }
 
     def action_test_n8n_connection(self):
-        """Test connectivity to n8n using the configured base URL and secret."""
+        """
+        Bidirectional handshake: POST Odoo's callback credentials to n8n's
+        connection_test webhook.  n8n stores them and (optionally) pings
+        Odoo back at /api/sales_ai/ping to verify the reverse direction.
+
+        Handshake payload sent to n8n:
+        {
+            "odoo_base_url":   "https://myodoo.com",
+            "odoo_api_key":    "<Bearer token for n8n → Odoo>",
+            "shared_secret":   "<X-N8N-Secret value>",
+            "hmac_secret":     "<HMAC signing secret>",
+            "endpoints": [     // available callback endpoints
+                "/api/sales_ai/lead_intake_complete",
+                "/api/sales_ai/ping",
+                ...
+            ]
+        }
+
+        Expected n8n response (JSON):
+        {
+            "status": "ok",
+            "reverse_verified": true/false,  // did n8n successfully ping Odoo back?
+            "n8n_version": "1.x.x",         // optional
+            "registered_endpoints": [...]    // optional — which endpoints n8n stored
+        }
+        """
         import requests
 
         self.ensure_one()
         base_url = (self.n8n_webhook_base_url or "").strip()
         secret = (self.n8n_secret_token or "").strip()
+        env_tag = (self.n8n_environment or "live").strip()
+        odoo_url = (self.odoo_base_url or "").strip()
+        odoo_key = (self.odoo_api_key or "").strip()
 
+        ICP = self.env["ir.config_parameter"].sudo()
+
+        # --- Validate required fields ---
+        missing = []
         if not base_url:
-            raise UserError(_("Please set the n8n Webhook Base URL first."))
+            missing.append("n8n Webhook Base URL")
         if not secret:
-            raise UserError(_("Please set or generate the n8n Header Auth Secret first."))
+            missing.append("n8n Header Auth Secret")
+        if not odoo_url:
+            missing.append("Odoo Base URL")
+        if not odoo_key:
+            missing.append("Odoo API Key")
 
-        # Simple GET to the base URL with the header; we only care if we reach n8n
-        # and get a non-error HTTP status code.
+        if missing:
+            msg = _(
+                "Please configure the following before testing: %s"
+            ) % ", ".join(missing)
+            _logger.warning(
+                "sales_ai: [N8N-CONNECT] Missing fields: %s", ", ".join(missing)
+            )
+            ICP.set_param("sales_ai.n8n_status", "error")
+            ICP.set_param("sales_ai.n8n_last_error", msg)
+            return {
+                "type": "ir.actions.client",
+                "tag": "display_notification",
+                "params": {
+                    "title": _("n8n Connection"),
+                    "type": "warning",
+                    "message": msg,
+                    "sticky": True,
+                },
+            }
+
+        # --- Build handshake payload ---
+        handshake_payload = {
+            "odoo_base_url": odoo_url.rstrip("/"),
+            "odoo_api_key": odoo_key,
+            "shared_secret": secret,
+            "hmac_secret": (self.n8n_hmac_secret or "").strip(),
+            "endpoints": [
+                "/api/sales_ai/ping",
+                "/api/sales_ai/lead_intake_complete",
+                "/api/sales_ai/receive_apollo_data",
+                "/api/sales_ai/receive_transcript",
+                "/api/sales_ai/enrichment_structured",
+                "/api/sales_ai/proposal_ready",
+                "/api/sales_ai/wbs_ready",
+                "/api/sales_ai/presale_mom_posted",
+                "/api/sales_ai/stale_deals",
+                "/api/sales_ai/calendar_event_create",
+                "/api/sales_ai/meeting_done",
+                "/api/sales_ai/meeting_no_show",
+                "/api/sales_ai/presale_transcript",
+                "/api/enrich_lead",
+                "/api/create_mom_activity",
+            ],
+        }
+
+        suffix = "webhook-test" if env_tag == "test" else "webhook"
+        url = f"{base_url.rstrip('/')}/{suffix}/connection_test"
+        headers = {
+            "Content-Type": "application/json",
+            "X-N8N-Secret": secret,
+        }
+
+        # --- Send handshake ---
+        ok = False
+        reverse_ok = False
         try:
-            resp = requests.get(
-                base_url,
-                headers={"X-N8N-Secret": secret},
-                timeout=5,
+            _logger.info(
+                "sales_ai: [N8N-CONNECT] Bidirectional handshake POST %s (env=%s)",
+                url, env_tag,
+            )
+            resp = requests.post(
+                url, json=handshake_payload, headers=headers, timeout=90,
             )
             ok = resp.ok
             status = resp.status_code
         except Exception as exc:
-            ok = False
             status = None
             msg = _("Failed to reach n8n: %s") % exc
+            _logger.error(
+                "sales_ai: [N8N-CONNECT] Handshake error: %s", exc, exc_info=True,
+            )
         else:
             if ok:
-                msg = _(
-                    "Successfully reached n8n (HTTP %s). "
-                    "If you have a specific webhook path, make sure it matches this base URL."
-                ) % status
+                # Parse n8n response for reverse verification status
+                try:
+                    body = resp.json()
+                except Exception:
+                    body = {}
+                reverse_ok = body.get("reverse_verified", False)
+                registered = body.get("registered_endpoints") or []
+                n8n_version = body.get("n8n_version") or "unknown"
+
+                ICP.set_param("sales_ai.n8n_status", "ok")
+                ICP.set_param("sales_ai.n8n_last_ok", fields.Datetime.now())
+                ICP.set_param("sales_ai.n8n_last_error", "")
+                ICP.set_param(
+                    "sales_ai.n8n_reverse_status", "ok" if reverse_ok else "unknown",
+                )
+
+                if reverse_ok:
+                    msg = _(
+                        "Bidirectional handshake OK (HTTP %s). "
+                        "n8n verified reverse connection to Odoo. "
+                        "n8n version: %s, registered %d endpoint(s)."
+                    ) % (status, n8n_version, len(registered))
+                else:
+                    msg = _(
+                        "Odoo → n8n connected (HTTP %s). "
+                        "n8n did not confirm reverse ping to Odoo — "
+                        "update your n8n connection_test workflow to verify the "
+                        "reverse direction. n8n version: %s."
+                    ) % (status, n8n_version)
+
+                _logger.info(
+                    "sales_ai: [N8N-CONNECT] Handshake OK (HTTP %s, reverse=%s, "
+                    "n8n_version=%s, registered=%s)",
+                    status, reverse_ok, n8n_version, registered,
+                )
             else:
                 msg = _(
-                    "n8n responded with HTTP %s. Check that the URL and secret are correct."
+                    "n8n responded with HTTP %s. "
+                    "Check the URL, environment, and secret."
                 ) % status
+                _logger.warning(
+                    "sales_ai: [N8N-CONNECT] Handshake failed (HTTP %s)", status,
+                )
+                ICP.set_param("sales_ai.n8n_status", "error")
+                ICP.set_param("sales_ai.n8n_last_error", msg)
+                ICP.set_param("sales_ai.n8n_reverse_status", "error")
 
         return {
             "type": "ir.actions.client",
             "tag": "display_notification",
             "params": {
-                "title": _("n8n Connection Test"),
+                "title": _("n8n Connection"),
                 "type": "success" if ok else "warning",
                 "message": msg,
-                "sticky": False,
+                "sticky": not ok,
             },
         }
 

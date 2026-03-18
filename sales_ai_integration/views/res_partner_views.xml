@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_res_partner_form_sales_ai" model="ir.ui.view">
+        <field name="name">res.partner.form.sales.ai</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='sales_purchases']" position="after">
+                <page string="Sales AI Enrichment">
+                    <group string="Contact">
+                        <field name="x_contact_job_title"/>
+                        <field name="x_contact_seniority_structured"/>
+                        <field name="x_contact_decision_authority"/>
+                        <field name="x_is_decision_maker"/>
+                        <field name="x_direct_email"/>
+                        <field name="x_direct_phone"/>
+                        <field name="x_contact_linkedin_url"/>
+                        <field name="x_contact_score"/>
+                        <field name="x_intent_score"/>
+                    </group>
+                    <group string="Company">
+                        <field name="x_industry"/>
+                        <field name="x_sub_industry"/>
+                        <field name="x_employee_count_range"/>
+                        <field name="x_employee_count"/>
+                        <field name="x_annual_revenue_range"/>
+                        <field name="x_annual_revenue"/>
+                        <field name="x_is_it_company"/>
+                        <field name="x_funding_stage"/>
+                        <field name="x_company_linkedin_url"/>
+                        <field name="x_hq_country_id"/>
+                        <field name="x_hq_city"/>
+                        <field name="x_founded_year"/>
+                        <field name="x_website"/>
+                    </group>
+                    <group string="AI Signals">
+                        <field name="x_likely_pain_point" widget="text"/>
+                        <field name="x_similar_companies_won" widget="text"/>
+                        <field name="x_icp_match_signals" widget="text"/>
+                        <field name="x_icp_disqualify_signals" widget="text"/>
+                        <field name="x_inquiry_category"/>
+                        <field name="x_inquiry_urgency"/>
+                        <field name="x_lead_language"/>
+                        <field name="x_enrichment_conf"/>
+                        <field name="x_enrichment_source"/>
+                        <field name="x_enrichment_date"/>
+                    </group>
+                    <group string="Key Fit Signals">
+                        <field name="x_fit_industry"/>
+                        <field name="x_fit_company_size"/>
+                        <field name="x_fit_revenue_range"/>
+                        <field name="x_fit_geography"/>
+                        <field name="x_fit_contact_seniority"/>
+                        <field name="x_fit_decision_authority"/>
+                        <field name="x_fit_urgency"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>
+

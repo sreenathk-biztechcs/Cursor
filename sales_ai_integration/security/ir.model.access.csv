@@ -2,5 +2,6 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_sales_ai_lead,access_sales_ai_lead,crm.model_crm_lead,base.group_user,1,1,1,0
 access_sales_ai_task,access_sales_ai_task,project.model_project_task,base.group_user,1,1,1,0
 access_sales_ai_icp_wizard,access_sales_ai_icp_wizard,model_sales_ai_icp_criteria_wizard,base.group_user,1,1,1,0
-
-
+access_sales_ai_lead_manager,access_sales_ai_lead_manager,crm.model_crm_lead,base.group_system,1,1,1,1
+access_sales_ai_task_manager,access_sales_ai_task_manager,project.model_project_task,base.group_system,1,1,1,1
+access_sales_ai_meeting_transcript,access_sales_ai_meeting_transcript,model_sales_ai_meeting_transcript,base.group_system,1,1,1,1

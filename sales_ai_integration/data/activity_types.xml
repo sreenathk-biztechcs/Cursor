@@ -15,4 +15,24 @@
         <field name="name">Presale Email Draft</field>
         <field name="res_model">crm.lead</field>
     </record>
+
+    <record id="activity_type_no_show_followup" model="mail.activity.type">
+        <field name="name">No-Show Follow-up</field>
+        <field name="res_model">crm.lead</field>
+    </record>
+
+    <record id="activity_type_reply_received" model="mail.activity.type">
+        <field name="name">Reply Received</field>
+        <field name="res_model">crm.lead</field>
+    </record>
+
+    <record id="activity_type_auto_ack_review" model="mail.activity.type">
+        <field name="name">Auto-Ack Review</field>
+        <field name="res_model">crm.lead</field>
+    </record>
+
+    <record id="activity_type_meeting_prep_brief" model="mail.activity.type">
+        <field name="name">Meeting Prep Brief</field>
+        <field name="res_model">crm.lead</field>
+    </record>
 </odoo>

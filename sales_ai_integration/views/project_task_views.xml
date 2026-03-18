@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Presale Ticket form view extension -->
+    <record id="view_project_task_form_presale" model="ir.ui.view">
+        <field name="name">project.task.form.presale</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_form2"/>
+        <field name="arch" type="xml">
+
+            <!-- Action buttons in header -->
+            <xpath expr="//form/header" position="inside">
+                <button name="action_generate_ticket_gist"
+                        type="object"
+                        string="Regenerate Gist"
+                        class="btn-secondary"
+                        invisible="x_linked_lead_id == False"/>
+                <button name="action_generate_presale_mom"
+                        type="object"
+                        string="Generate Presale MOM"
+                        class="oe_highlight"
+                        invisible="x_linked_lead_id == False"/>
+                <button name="action_generate_wbs"
+                        type="object"
+                        string="Generate WBS (AI)"
+                        class="oe_highlight"
+                        invisible="x_ticket_status not in ('open', 'ready_for_wbs')"/>
+                <button name="action_request_proposal_from_ai"
+                        type="object"
+                        string="Request Proposal from AI"
+                        class="oe_highlight"
+                        invisible="x_ticket_status not in ('wbs_done', 'ready_for_proposal')"/>
+            </xpath>
+
+            <!-- Presale fields tab in the task notebook -->
+            <xpath expr="//notebook" position="inside">
+                <page string="Presale">
+                    <group name="presale_info" string="Presale Information">
+                        <field name="x_linked_lead_id"/>
+                        <field name="x_ticket_status"/>
+                        <field name="x_last_agenda_date"/>
+                        <field name="x_retro_logged"/>
+                    </group>
+                    <group name="presale_docs" string="Documents">
+                        <field name="x_wbs_sheet_url" widget="url"/>
+                        <field name="x_proposal_drive_url" widget="url"/>
+                    </group>
+                    <group name="presale_ai" string="AI Output">
+                        <field name="x_ticket_gist" widget="text"/>
+                    </group>
+                    <group name="presale_wbs" string="WBS JSON" groups="base.group_system">
+                        <field name="x_wbs_json" widget="text"/>
+                    </group>
+                </page>
+            </xpath>
+
+        </field>
+    </record>
+
+    <!-- Presale Kanban view — filtered to Presale project tasks -->
+    <record id="view_project_task_kanban_presale" model="ir.ui.view">
+        <field name="name">project.task.kanban.presale</field>
+        <field name="model">project.task</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="x_ticket_status" quick_create="false">
+                <field name="x_linked_lead_id"/>
+                <field name="x_ticket_status"/>
+                <field name="x_wbs_sheet_url"/>
+                <field name="x_proposal_drive_url"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_title">
+                                    <strong><field name="name"/></strong>
+                                </div>
+                                <div t-if="record.x_linked_lead_id.value" class="text-muted">
+                                    Lead: <field name="x_linked_lead_id"/>
+                                </div>
+                                <div t-if="record.x_wbs_sheet_url.value">
+                                    <a t-att-href="record.x_wbs_sheet_url.value" target="_blank">WBS Sheet</a>
+                                </div>
+                                <div t-if="record.x_proposal_drive_url.value">
+                                    <a t-att-href="record.x_proposal_drive_url.value" target="_blank">Proposal</a>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Presale Tickets menu action -->
+    <record id="action_presale_tickets" model="ir.actions.act_window">
+        <field name="name">Presale Tickets</field>
+        <field name="res_model">project.task</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'kanban', 'view_id': ref('view_project_task_kanban_presale')}),
+            (0, 0, {'view_mode': 'list'}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('project.view_task_form2')}),
+        ]"/>
+        <field name="domain">[('x_linked_lead_id', '!=', False)]</field>
+        <field name="context">{"search_default_my_tasks": 0}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No presale tickets yet. Create a presale ticket from a CRM lead.
+            </p>
+        </field>
+    </record>
+</odoo>

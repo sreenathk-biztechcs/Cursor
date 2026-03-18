@@ -6,66 +6,175 @@
         <field name="inherit_id" ref="crm.crm_lead_view_form"/>
         <field name="arch" type="xml">
 
-            <!-- Header buttons -->
+            <!-- ── Header action buttons ── -->
             <xpath expr="//form/header" position="inside">
                 <button name="action_run_lead_scoring"
                         type="object"
                         string="Re-score Lead"
                         class="oe_highlight"
                         invisible="x_enrichment_done == False"/>
-                <button name="action_start_presale"
+                <button name="action_trigger_lead_intake"
                         type="object"
-                        string="Start Presale"
+                        string="Sync Enrichment"
+                        class="btn-secondary"
+                        context="{'sales_ai_force_full_intake': True}"
+                        invisible="x_classification != 'genuine' or not email_from"/>
+                <button name="action_open_presale"
+                        type="object"
+                        string="Open Presale"
                         class="oe_highlight"
                         invisible="x_presale_status != 'none'"/>
+                <button name="action_generate_wbs"
+                        type="object"
+                        string="Generate WBS"
+                        class="oe_highlight"
+                        invisible="x_presale_status not in ('open', 'ready_for_wbs')"/>
                 <button name="action_request_proposal_from_ai"
                         type="object"
-                        string="Request Proposal from AI"
+                        string="Request Proposal (AI)"
                         class="oe_highlight"
-                        invisible="x_presale_status != 'wbs_done'"/>
+                        invisible="x_presale_status not in ('wbs_done', 'ready_for_wbs', 'ready_for_proposal')"/>
+                <button name="action_request_meeting_transcript"
+                        type="object"
+                        string="Sync Transcript"
+                        class="btn-secondary"
+                        title="Ask n8n to fetch the meeting transcript from Apollo and generate MOM"/>
+                <button name="action_no_show_followup"
+                        type="object"
+                        string="No-Show Follow-up"
+                        class="btn-warning"/>
                 <button name="action_extract_attachment_texts"
                         type="object"
-                        string="Sync Attachments for AI"
+                        string="Sync Attachments"
                         class="btn-secondary"/>
             </xpath>
 
-            <!-- AI Data + Presale tabs in notebook -->
+            <!-- ── Tabs: AI Data | Enrichment | ICP Score | Presale ── -->
             <xpath expr="//sheet/notebook" position="inside">
+
+                <!-- Tab 1: AI Classification & Follow-up -->
                 <page string="AI Data">
-                    <group name="ai_main" string="Lead AI Summary">
-                        <field name="x_lead_quality"/>
+                    <group name="ai_classification" string="Classification &amp; Scoring">
+                        <field name="x_classification"/>
+                        <field name="x_classification_conf" string="Confidence (%)"/>
+                        <field name="x_classification_reason"/>
+                        <field name="x_lead_quality" string="Legacy Quality"/>
                         <field name="x_lead_score"/>
                         <field name="x_lead_score_band"/>
                         <field name="x_apollo_match"/>
+                        <field name="x_enrichment_done"/>
+                    </group>
+                    <group name="ai_followup" string="Follow-up &amp; Reply">
                         <field name="x_followup_stage"/>
                         <field name="x_reply_intent"/>
                         <field name="x_last_reply_date"/>
+                        <field name="x_ooo_return_date"/>
+                        <field name="x_unsubscribed"/>
                     </group>
-                    <group name="ai_enrichment" string="Enrichment (Apollo)">
-                        <field name="x_is_it_company"/>
-                        <field name="x_employee_count"/>
-                        <field name="x_annual_revenue"/>
-                        <field name="x_tech_stack"/>
-                        <field name="x_seniority"/>
-                        <field name="x_is_decision_maker"/>
-                        <field name="x_contact_score"/>
-                        <field name="x_intent_score"/>
-                        <field name="x_linkedin_url" widget="url"/>
+                    <group name="ai_scoring_detail" string="Score Rationale">
+                        <field name="x_lead_score_rationale" widget="text"/>
                     </group>
                 </page>
 
+                <!-- Tab 2: Enrichment — all 30 Apollo/AI fields -->
+                <page string="Enrichment">
+                    <group name="enrichment_person" string="Contact">
+                        <field name="x_contact_seniority_structured"/>
+                        <field name="x_contact_job_title"/>
+                        <field name="x_contact_decision_authority"/>
+                        <field name="x_is_decision_maker"/>
+                        <field name="x_direct_email"/>
+                        <field name="x_direct_phone"/>
+                        <field name="x_contact_linkedin_url" widget="url"/>
+                        <field name="x_contact_score"/>
+                        <field name="x_intent_score"/>
+                    </group>
+                    <group name="enrichment_company" string="Company">
+                        <field name="x_industry"/>
+                        <field name="x_subindustry"/>
+                        <field name="x_employee_count_range"/>
+                        <field name="x_employee_count"/>
+                        <field name="x_revenue_range"/>
+                        <field name="x_annual_revenue"/>
+                        <field name="x_is_it_company"/>
+                        <field name="x_company_funding_stage"/>
+                        <field name="x_company_linkedin_url" widget="url"/>
+                        <field name="x_hq_country_id"/>
+                        <field name="x_hq_city"/>
+                        <field name="x_founded_year"/>
+                        <field name="x_website" widget="url"/>
+                    </group>
+                    <group name="enrichment_ai_signals" string="AI Signals">
+                        <field name="x_likely_pain_point" widget="text"/>
+                        <field name="x_similar_companies_won"/>
+                        <field name="x_icp_match_signals"/>
+                        <field name="x_icp_disqualify_signals"/>
+                        <field name="x_inquiry_category"/>
+                        <field name="x_inquiry_urgency"/>
+                        <field name="x_lead_language"/>
+                        <field name="x_enrichment_conf"/>
+                        <field name="x_enrichment_source"/>
+                        <field name="x_enrichment_date"/>
+                    </group>
+                    <group name="enrichment_raw" string="Raw Apollo Data" groups="base.group_system">
+                        <field name="x_apollo_person_id"/>
+                        <field name="x_linkedin_url" widget="url"/>
+                        <field name="x_tech_stack" widget="text"/>
+                        <field name="x_apollo_data_raw" widget="text"/>
+                    </group>
+                </page>
+
+                <!-- Tab 3: ICP Score Breakdown -->
+                <page string="ICP Score" invisible="x_lead_score == 0">
+                    <group name="icp_score" string="Score Summary">
+                        <field name="x_lead_score" string="Total Score (0–100)"/>
+                        <field name="x_lead_score_band" string="Band"/>
+                        <field name="x_lead_score_rationale" string="Rationale" widget="text"/>
+                    </group>
+                    <group name="icp_breakdown" string="Scoring Breakdown (JSON)" groups="base.group_system">
+                        <field name="x_lead_score_breakdown" widget="text"/>
+                    </group>
+                    <group name="icp_signals" string="Key Fit Signals">
+                        <field name="x_industry" string="Industry"/>
+                        <field name="x_employee_count_range" string="Company Size"/>
+                        <field name="x_revenue_range" string="Revenue Range"/>
+                        <field name="x_hq_country_id" string="Geography"/>
+                        <field name="x_contact_seniority_structured" string="Contact Seniority"/>
+                        <field name="x_contact_decision_authority" string="Decision Authority"/>
+                        <field name="x_inquiry_urgency" string="Urgency"/>
+                    </group>
+                </page>
+
+                <!-- Tab 4: Presale (entire workflow on this lead) -->
                 <page string="Presale" invisible="x_presale_status == 'none'">
-                    <group name="presale_main" string="Presale Status">
+                    <group name="presale_status" string="Presale Status">
+                        <field name="x_presale_ref" string="Reference"/>
                         <field name="x_presale_status"/>
-                        <field name="x_wbs_sheet_url" widget="url"/>
-                        <field name="x_proposal_drive_url" widget="url"/>
                         <field name="x_last_agenda_date"/>
                         <field name="x_retro_logged"/>
                     </group>
-                    <group name="presale_links" string="Optional Links">
-                        <field name="x_presale_ticket_id"/>
+                    <group name="presale_docs" string="Documents">
+                        <field name="x_wbs_sheet_url" widget="url"/>
+                        <field name="x_proposal_drive_url" widget="url"/>
+                    </group>
+                    <group name="presale_gist" string="Discussion Gist (AI)">
+                        <field name="x_ticket_gist" widget="text" nolabel="1"/>
+                    </group>
+                    <group name="presale_wbs" string="WBS JSON" groups="base.group_system">
+                        <field name="x_wbs_json" widget="text" nolabel="1"/>
+                    </group>
+                    <group name="presale_mom_hist" string="MOM History" groups="base.group_system">
+                        <field name="x_presale_mom_history" widget="text" nolabel="1"/>
                     </group>
                 </page>
+
+                <!-- Tab 5: Meeting Transcripts -->
+                <page string="Transcripts" groups="base.group_system">
+                    <group>
+                        <field name="transcript_ids" nolabel="1"/>
+                    </group>
+                </page>
+
             </xpath>
 
         </field>
